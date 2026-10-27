@@ -1,0 +1,40 @@
+# Release (RELEASING.md): runs on a version tag and refuses to go further without the release
+# notes in docs/releases/<version>.md. The packaging module adds the verify, build, draft, upload
+# and publish jobs after this gate.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to check, for example 0.1.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  notes:
+    name: release notes gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Refuse a release without docs/releases/<version>.md
+        env:
+          VERSION: ${{ inputs.version || github.ref_name }}
+        run: |
+          version="${VERSION#v}"
+          notes="docs/releases/$version.md"
+          if [ ! -f "$notes" ]; then
+            echo "$notes is missing; write the release notes first." >&2
+            exit 1
+          fi
+          echo "release notes found: $notes"
+
+      - name: Build and publish
+        run: echo "The installers, the draft release and the upload are added by the packaging module (docs/modules/10-packaging-and-release.md)."

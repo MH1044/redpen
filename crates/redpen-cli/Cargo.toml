@@ -1,0 +1,31 @@
+[package]
+name = "redpen-cli"
+description = "Redpen's command-line tool (the `redpen` binary), used by the golden tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[[bin]]
+name = "redpen"
+path = "src/main.rs"
+
+# The golden harness builds its own list of tests, one per case directory, so it runs without
+# the default harness (docs/TESTING.md §1).
+[[test]]
+name = "golden"
+harness = false
+
+[dependencies]
+redpen-core = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+ignore = { workspace = true }
+libtest-mimic = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true }

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Redpen",
+  "version": "0.1.0",
+  "identifier": "org.redpen.app",
+  "build": {
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Redpen",
+        "width": 480,
+        "height": 320,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.png", "icons/icon.ico"]
+  }
+}

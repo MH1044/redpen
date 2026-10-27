@@ -1,0 +1,95 @@
+# Baseline .gitignore for every project. Append the stack-specific block at the end.
+
+# Build output and dependencies
+node_modules/
+dist/
+build/
+out/
+target/
+release/
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Secrets: see SECURITY.md. Keys live outside the repository, always.
+.env
+.env.*
+!.env.example
+secrets.json
+publik-status.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision
+secrets/
+
+# Model weights and large media: downloaded by checksum, never committed.
+# The model registry (URLs and checksums) is committed.
+/models/*
+!/models/registry.toml
+*.onnx
+*.pt
+*.pth
+*.safetensors
+*.gguf
+*.bin
+*.mp4
+*.mov
+*.wav
+*.flac
+*.mp3
+*.m4a
+
+# User data and evaluation sets that may contain personal data
+/eval-data/
+/user-data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Logs that tools save into the working directory
+*.log
+npm-debug.log*
+*-localsave*.txt
+
+# Local tool configuration
+.claude/
+CLAUDE.md
+AGENTS.md
+
+# Per-machine editor and tool state, which carries absolute home-directory paths
+CLAUDE.local.md
+.cursor/
+.aider*
+.continue/
+
+# Editor and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Private working material that is not part of the project
+/private/
+
+# Exceptions: fixtures that are deliberately small and generated or CC0 go under
+# tests/fixtures/ and are re-included explicitly by the stack block, e.g.
+# !tests/fixtures/**/*.wav
+
+# Stack: Rust workspace, Vite front end, Tauri app
+target/
+app/node_modules/
+app/dist/
+app/src-tauri/gen/schemas/

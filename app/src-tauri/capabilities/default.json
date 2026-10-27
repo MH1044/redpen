@@ -1,0 +1,6 @@
+{
+  "identifier": "default",
+  "description": "The hidden main window gets the core permissions only. No filesystem, shell, dialog or HTTP permission exists: every such action goes through a command the core controls.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

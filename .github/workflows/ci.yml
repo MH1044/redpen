@@ -1,0 +1,81 @@
+# CI (docs/TESTING.md §6): the full check on Windows and Linux for every push to main and every
+# pull request, then the launch smoke. The windows-integration job arrives with module 05 and the
+# release jobs with module 10.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Linux prerequisites for Tauri
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev \
+            libssl-dev libayatana-appindicator3-dev librsvg2-dev xvfb dbus
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Rust toolchain from rust-toolchain.toml
+        run: |
+          rustup toolchain install
+          rustup show active-toolchain
+          cargo --version
+          cargo fmt --version
+          cargo clippy --version
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo-deny
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny@0.20.2
+
+      - name: verify
+        shell: bash
+        run: sh scripts/verify.sh
+
+      # The launch smoke (docs/TESTING.md §1): the tray app starts, the hidden interface window
+      # reports ready, and the app exits 0 within 20 seconds.
+      - name: launch smoke (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cargo build -p redpen-app
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & target/debug/redpen-app.exe --smoke
+          if ($LASTEXITCODE -ne 0) { Write-Host "launch smoke failed with exit code $LASTEXITCODE"; exit $LASTEXITCODE }
+
+      - name: launch smoke (Linux)
+        if: runner.os == 'Linux'
+        env:
+          WEBKIT_DISABLE_DMABUF_RENDERER: '1'
+          WEBKIT_DISABLE_COMPOSITING_MODE: '1'
+        run: |
+          cargo build -p redpen-app
+          timeout 90 dbus-run-session -- xvfb-run -a target/debug/redpen-app --smoke
