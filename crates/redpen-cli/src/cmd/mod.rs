@@ -2,8 +2,10 @@
 //! option parsing, reading the input file, and the exit codes.
 //!
 //! Exit codes: 0 success; 1 a gate that measured a failure (`check-speed`); 2 a usage error, a
-//! file that cannot be read as UTF-8 text, or a text the core refused (`TooLong`).
+//! file that cannot be read as UTF-8 text, or a text the core refused (`TooLong`); 3 a provider
+//! call that failed (`chat`: an `AiError`, an unrecorded request included).
 
+pub mod chat;
 pub mod check;
 pub mod check_speed;
 pub mod fix_all;
@@ -16,6 +18,7 @@ use serde::Serialize;
 pub const OK: i32 = 0;
 pub const GATE_FAILED: i32 = 1;
 pub const USAGE: i32 = 2;
+pub const AI_ERROR: i32 = 3;
 
 /// A failed command: what to print on standard error, and the exit code.
 #[derive(Debug, PartialEq, Eq)]

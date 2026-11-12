@@ -4,7 +4,14 @@
 //! request, fails on any request it has no entry for (invariant 11), writing that request's body
 //! under `target/unrecorded/` so a hand-written entry can be added, and keeps every request it
 //! saw so privacy tests can assert on what would have left the machine.
+//!
+//! Several entries for the same request answer it in turn, the last one repeating, so a script
+//! can say "timeout, timeout, then 200" (module 02's retries). An entry with status 0 is not an
+//! answer but a failed connection: its body `{"transport_error": "timeout" | "offline" | "tls"}`
+//! names the [`TransportError`] the transport returns ([`FakeEntry::failing`] builds one). Such
+//! entries belong in code tests only: the recordings check refuses them in a `recording.json`.
 
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -31,11 +38,62 @@ pub enum FakeError {
     Format { path: String, message: String },
 }
 
+/// The status of an entry that stands for a failed connection rather than an answer.
+pub const TRANSPORT_ERROR_STATUS: u16 = 0;
+
+impl RecordingEntry {
+    /// A hand-written entry answering `req` with `status` and `body`, and no headers.
+    pub fn reply(req: &HttpRequest, status: u16, body: Value) -> Self {
+        Self {
+            request_sha256: request_hash(req),
+            source: "hand-written".into(),
+            request: match &req.body {
+                Body::Empty => Value::Null,
+                Body::Json(v) => v.clone(),
+            },
+            status,
+            headers: Vec::new(),
+            body,
+        }
+    }
+
+    /// A hand-written entry for which the fake transport fails with `error` (a timeout, no
+    /// connection, or a TLS failure) instead of answering `req`.
+    pub fn failing(req: &HttpRequest, error: TransportError) -> Self {
+        let name = match error {
+            TransportError::Timeout => "timeout",
+            TransportError::Tls(_) => "tls",
+            TransportError::Offline | TransportError::Unrecorded { .. } => "offline",
+        };
+        Self::reply(
+            req,
+            TRANSPORT_ERROR_STATUS,
+            serde_json::json!({ "transport_error": name }),
+        )
+    }
+
+    /// The transport error this entry stands for, if it is not an answer.
+    pub fn transport_error(&self) -> Option<TransportError> {
+        if self.status != TRANSPORT_ERROR_STATUS {
+            return None;
+        }
+        Some(
+            match self.body.get("transport_error").and_then(Value::as_str) {
+                Some("timeout") => TransportError::Timeout,
+                Some("tls") => TransportError::Tls("handshake failed".into()),
+                _ => TransportError::Offline,
+            },
+        )
+    }
+}
+
 /// A transport that answers only recorded requests.
 #[derive(Debug)]
 pub struct FakeTransport {
     entries: Vec<FakeEntry>,
     seen: Mutex<Vec<HttpRequest>>,
+    /// How many times each request hash has been answered, for entries that answer in turn.
+    served: Mutex<HashMap<String, usize>>,
 }
 
 impl FakeTransport {
@@ -68,6 +126,7 @@ impl FakeTransport {
         Self {
             entries,
             seen: Mutex::new(Vec::new()),
+            served: Mutex::new(HashMap::new()),
         }
     }
 
@@ -117,7 +176,23 @@ impl HttpTransport for FakeTransport {
             .lock()
             .expect("request log is not poisoned")
             .push(req.clone());
-        if let Some(entry) = self.entries.iter().find(|e| e.request_sha256 == hash) {
+        let matching: Vec<&FakeEntry> = self
+            .entries
+            .iter()
+            .filter(|e| e.request_sha256 == hash)
+            .collect();
+        if !matching.is_empty() {
+            let turn = {
+                let mut served = self.served.lock().expect("answer count is not poisoned");
+                let count = served.entry(hash.clone()).or_insert(0);
+                let turn = (*count).min(matching.len() - 1);
+                *count += 1;
+                turn
+            };
+            let entry = matching[turn];
+            if let Some(error) = entry.transport_error() {
+                return Err(error);
+            }
             let body = serde_json::to_vec(&entry.body).expect("a JSON value serialises");
             let headers = entry
                 .headers
@@ -196,6 +271,46 @@ mod tests {
             other => panic!("unexpected error {other:?}"),
         }
         assert_eq!(fake.requests_seen().len(), 1);
+    }
+
+    #[tokio::test]
+    async fn entries_for_one_request_answer_in_turn_and_the_last_repeats() {
+        let req = HttpRequest::post_json("http://localhost:11434/v1/chat/completions", json!({}));
+        let fake = FakeTransport::scripted(vec![
+            FakeEntry::failing(&req, TransportError::Timeout),
+            FakeEntry::reply(&req, 503, json!({})),
+            FakeEntry::reply(&req, 200, json!({"choices": []})),
+        ]);
+        assert_eq!(
+            fake.send(req.clone()).await.unwrap_err(),
+            TransportError::Timeout
+        );
+        assert_eq!(fake.send(req.clone()).await.unwrap().status, 503);
+        assert_eq!(fake.send(req.clone()).await.unwrap().status, 200);
+        assert_eq!(fake.send(req).await.unwrap().status, 200);
+        assert_eq!(fake.requests_seen().len(), 4);
+    }
+
+    #[tokio::test]
+    async fn a_failing_entry_gives_its_transport_error() {
+        let tags = HttpRequest::get("http://localhost:11434/api/tags");
+        let chat = HttpRequest::post_json("https://api.example.com/v1/chat/completions", json!({}));
+        let fake = FakeTransport::scripted(vec![
+            FakeEntry::failing(&tags, TransportError::Offline),
+            FakeEntry::failing(&chat, TransportError::Tls("x".into())),
+        ]);
+        assert_eq!(fake.send(tags).await.unwrap_err(), TransportError::Offline);
+        assert!(matches!(
+            fake.send(chat).await.unwrap_err(),
+            TransportError::Tls(_)
+        ));
+        let entry = FakeEntry::failing(
+            &HttpRequest::get("http://localhost:11434/api/tags"),
+            TransportError::Timeout,
+        );
+        assert_eq!(entry.status, TRANSPORT_ERROR_STATUS);
+        assert_eq!(entry.body, json!({"transport_error": "timeout"}));
+        assert_eq!(entry.source, "hand-written");
     }
 
     #[test]

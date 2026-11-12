@@ -1,9 +1,11 @@
 //! `redpen`: the command-line tool the golden tests and the maintainer's scripts drive
 //! (docs/ARCHITECTURE.md §5). It never provisions Publik. Module 00 gives it `--version`; module
-//! 01 `check`, `fix-all` and the `check-speed` measurement; `rewrite`, `prompt`, `redact`,
-//! `diff`, `chat` and `plagiarism` arrive with their modules.
+//! 01 `check`, `fix-all` and the `check-speed` measurement; module 02 `chat` and the
+//! `--provider` choice; `rewrite`, `prompt`, `redact`, `diff` and `plagiarism` arrive with their
+//! modules.
 
 mod cmd;
+mod providers;
 
 use std::io::Write;
 
@@ -15,10 +17,13 @@ Usage: redpen --version [--json]
        redpen check [--dialect D] [--disable C]... FILE
        redpen fix-all [--dialect D] FILE
        redpen check-speed [--dialect D] [--runs N] FILE
+       redpen chat --provider P [--recording R] --message S
        redpen --help
 
 D: american (the default), british, australian, canadian or indian.
 C: spelling, grammar, punctuation or style.
+P: fake, local (Ollama on this computer) or own-key (reads REDPEN_OWN_KEY,
+   REDPEN_OWN_BASE_URL and REDPEN_OWN_MODEL). R: a recording.json to answer from.
 ";
 
 fn main() {
@@ -35,6 +40,7 @@ fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
         Some("check") => return cmd::check::run(&args[1..], out, err),
         Some("fix-all") => return cmd::fix_all::run(&args[1..], out, err),
         Some("check-speed") => return cmd::check_speed::run(&args[1..], out, err),
+        Some("chat") => return cmd::chat::run(&args[1..], out, err),
         _ => {}
     }
     let mut version = false;
@@ -112,6 +118,7 @@ mod tests {
         assert!(out.starts_with("Usage: redpen"));
         assert!(out.contains("redpen check [--dialect D] [--disable C]... FILE"));
         assert!(out.contains("redpen fix-all [--dialect D] FILE"));
+        assert!(out.contains("redpen chat --provider P [--recording R] --message S"));
         let (code, out, _) = run_capturing(&[]);
         assert_eq!(code, 0);
         assert!(out.starts_with("Usage: redpen"));

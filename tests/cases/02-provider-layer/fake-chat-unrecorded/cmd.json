@@ -1,0 +1,1 @@
+{"args": ["chat", "--provider", "fake", "--recording", "recording.json", "--message", "hi"], "exit": 3}

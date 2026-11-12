@@ -1,6 +1,7 @@
 //! HTTP, behind a trait (docs/ARCHITECTURE.md §3 and §7, invariants 10 and 11). The production
-//! transport (reqwest with rustls, module 02) and the test transport ([`FakeTransport`]) both
-//! implement [`HttpTransport`]; the core never opens a socket itself.
+//! transport ([`ReqwestTransport`], reqwest with rustls) and the test transport
+//! ([`FakeTransport`]) both implement [`HttpTransport`]; the rest of the core only ever sees the
+//! trait.
 //!
 //! A request is identified by [`request_hash`]: the method, the path after the provider's base
 //! path and the canonical JSON body. The fake answers by that hash from a recording and fails on
@@ -9,12 +10,14 @@
 pub mod fake;
 pub mod hash;
 pub mod recording;
+pub mod reqwest;
 
 use std::fmt;
 use std::time::Duration;
 
 use secrecy::{ExposeSecret, SecretString};
 
+pub use self::reqwest::ReqwestTransport;
 pub use fake::{FakeEntry, FakeError, FakeTransport};
 pub use hash::{canonical_json, request_hash, request_path};
 pub use recording::{Recorder, Recording, RecordingEntry};
@@ -190,6 +193,43 @@ pub trait HttpTransport: Send + Sync {
     async fn send(&self, req: HttpRequest) -> Result<HttpResponse, TransportError>;
 }
 
+/// The host of an `http` or `https` URL, lower-cased, without brackets for IPv6 (`::1`). `None`
+/// for any other scheme, a URL with user information (`user@host`), an empty host or a port
+/// that is not a number, so a crafted address can never pass for another host.
+pub fn url_host(url: &str) -> Option<String> {
+    let (scheme, rest) = url.split_once("://")?;
+    if !scheme.eq_ignore_ascii_case("http") && !scheme.eq_ignore_ascii_case("https") {
+        return None;
+    }
+    // A backslash ends the authority as a slash does, as WHATWG URL parsers treat it.
+    let authority = rest.split(['/', '\\', '?', '#']).next().unwrap_or("");
+    if authority.contains('@') {
+        return None;
+    }
+    let (host, port) = if let Some(bracketed) = authority.strip_prefix('[') {
+        let (host, after) = bracketed.split_once(']')?;
+        let port = match after {
+            "" => None,
+            p => Some(p.strip_prefix(':')?),
+        };
+        (host, port)
+    } else {
+        match authority.split_once(':') {
+            Some((host, port)) => (host, Some(port)),
+            None => (authority, None),
+        }
+    };
+    if let Some(port) = port
+        && (port.is_empty() || !port.bytes().all(|b| b.is_ascii_digit()))
+    {
+        return None;
+    }
+    if host.is_empty() {
+        return None;
+    }
+    Some(host.to_ascii_lowercase())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -221,6 +261,40 @@ mod tests {
         assert_eq!(resp.header("X-Publik-Charge-Micros"), Some("210"));
         assert_eq!(resp.header("x-publik-balance"), None);
         assert_eq!(resp.json(), Some(serde_json::json!({})));
+    }
+
+    #[test]
+    fn url_host_reads_the_host_and_refuses_tricks() {
+        assert_eq!(
+            url_host("http://localhost:11434/v1").as_deref(),
+            Some("localhost")
+        );
+        assert_eq!(
+            url_host("HTTP://LocalHost/v1").as_deref(),
+            Some("localhost")
+        );
+        assert_eq!(
+            url_host("http://127.0.0.1:8080/v1").as_deref(),
+            Some("127.0.0.1")
+        );
+        assert_eq!(url_host("http://[::1]:11434/v1").as_deref(), Some("::1"));
+        assert_eq!(url_host("http://[::1]").as_deref(), Some("::1"));
+        assert_eq!(
+            url_host("https://api.example.com/v1?x=1").as_deref(),
+            Some("api.example.com")
+        );
+        assert_eq!(
+            url_host("http://localhost\\@evil.example/").as_deref(),
+            Some("localhost")
+        );
+        assert_eq!(url_host("http://localhost@evil.example/"), None);
+        assert_eq!(url_host("http://evil.example@localhost/"), None);
+        assert_eq!(url_host("ftp://localhost/"), None);
+        assert_eq!(url_host("localhost:11434"), None);
+        assert_eq!(url_host("http:///v1"), None);
+        assert_eq!(url_host("http://localhost:abc/"), None);
+        assert_eq!(url_host("http://localhost:/"), None);
+        assert_eq!(url_host("http://[::1]x/"), None);
     }
 
     #[test]

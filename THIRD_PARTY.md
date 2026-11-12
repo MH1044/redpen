@@ -13,18 +13,22 @@ adds them.
 | async-trait | MIT OR Apache-2.0 | The async `HttpTransport` and `Sleeper` traits |
 | harper-core | Apache-2.0 | Grammar, spelling and style checking on this computer, pinned at `=3.0.0` (module 01); it brings Harper's `harper-brill`, `harper-pos-utils` and `harper-thesaurus` (Apache-2.0) |
 | unicode-segmentation | MIT OR Apache-2.0 | UAX #29 words: the 1,000-word text of the `check-speed` gate (later: word counts and sentences) |
-| secrecy | Apache-2.0 OR MIT | Header values that hold a key and never print it |
+| reqwest | MIT OR Apache-2.0 | The production HTTP transport for every provider (module 02), with its default TLS: rustls, certificates checked against the operating system's store by `rustls-platform-verifier` (MIT OR Apache-2.0), cryptography from `aws-lc-rs` (ISC AND (Apache-2.0 OR ISC)) |
+| rusqlite | MIT | `redpen.db`: the answer cache, daily usage and the sent log (module 02); with `bundled`, it compiles in SQLite itself through `libsqlite3-sys` (MIT), and SQLite's own source is in the public domain |
+| secrecy | Apache-2.0 OR MIT | Keys that never print: header values, the resolved provider, `secrets.json` |
 | serde | MIT OR Apache-2.0 | Serialisation of recordings, settings and command results |
 | serde_json | MIT OR Apache-2.0 | JSON bodies, recordings and the command-line tool's output |
-| sha2 | MIT OR Apache-2.0 | SHA-256 of canonical requests (later: cache keys) |
+| sha2 | MIT OR Apache-2.0 | SHA-256 of canonical requests and of the answer cache's keys |
 | thiserror | MIT OR Apache-2.0 | Error types with their messages |
-| tokio | MIT | The async runtime and the production `Sleeper` |
+| tokio | MIT | The async runtime (the command line's `chat` too) and the production `Sleeper` |
+| tracing | MIT | Log events without content: names, durations, sizes, error kinds and HTTP status codes (module 02) |
 | ignore (tests only) | Unlicense OR MIT | The source-hygiene test's fallback walk, honouring `.gitignore` |
 | libtest-mimic (tests only) | MIT OR Apache-2.0 | One test per golden case directory |
 | proptest (tests only) | MIT OR Apache-2.0 | Generated texts with a fixed seed in the checking tests (module 01) |
 | regex (tests only) | MIT OR Apache-2.0 | The source-hygiene test's patterns |
 | tempfile (tests only) | MIT OR Apache-2.0 | Temporary directories in tests |
 | toml (tests only) | MIT OR Apache-2.0 | Reading `deny.toml` in tests |
+| tracing-subscriber (tests only) | MIT | A capturing subscriber, so tests can prove no key reaches a log line (module 02) |
 
 ## npm packages (registry.npmjs.org)
 

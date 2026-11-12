@@ -15,11 +15,16 @@ redpen-core = { path = "crates/redpen-core" }
 async-trait = "0.1"
 # Pinned exactly: the module 01 goldens were recorded against Harper's own linter at this version.
 harper-core = "=3.0.0"
+# The production HTTP transport: rustls with the operating system's certificate store (module 02).
+reqwest = "0.13"
+# SQLite compiled in, so redpen.db works the same on every platform (module 02).
+rusqlite = { version = "0.42", features = ["bundled"] }
 secrecy = "0.10"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.11"
 thiserror = "2"
+tracing = "0.1"
 tokio = { version = "1", features = ["rt", "rt-multi-thread", "time", "macros"] }
 unicode-segmentation = "1"
 tauri = { version = "2", features = ["tray-icon"] }
@@ -31,6 +36,7 @@ proptest = "1"
 regex = "1"
 tempfile = "3"
 toml = "1"
+tracing-subscriber = "0.3"
 
 [profile.release]
 codegen-units = 1

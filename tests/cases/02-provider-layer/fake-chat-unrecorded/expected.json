@@ -1,0 +1,8 @@
+{
+  "error": {
+    "kind": "Unrecorded",
+    "message": "Unrecorded request 97e299ca6283bd08e7d8b19223e7972b337d72fc0f7c36475f083f6125311a05 to /chat/completions; body written to target/unrecorded/97e299ca6283bd08e7d8b19223e7972b337d72fc0f7c36475f083f6125311a05.json. Add a hand-written entry, or ask the maintainer to record it.",
+    "hash": "97e299ca6283bd08e7d8b19223e7972b337d72fc0f7c36475f083f6125311a05",
+    "path": "/chat/completions"
+  }
+}

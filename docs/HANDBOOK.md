@@ -8,9 +8,10 @@ every example in it has been run.
 Building from source (see `README.md`) gives:
 
 - a tray icon with one menu item, **Quit**; no window is shown yet;
-- the `redpen` command-line tool, which checks a text on this computer (below), answers
-  `redpen --version --json` with `{"name":"redpen","version":"0.1.0"}`, and refuses an unknown
-  argument with `error: unknown argument <arg>. Run redpen --help.`
+- the `redpen` command-line tool, which checks a text on this computer (below), sends one
+  message to an AI provider when you ask it to (below), answers `redpen --version --json` with
+  `{"name":"redpen","version":"0.1.0"}`, and refuses an unknown argument with
+  `error: unknown argument <arg>. Run redpen --help.`
 
 ## Checking a text on this computer
 
@@ -82,8 +83,69 @@ Formatting sit with Punctuation as the mechanics of the text.
   longer offered with "That suggestion is not available any more."
 - An empty file has no findings: `{"findings":[]}`.
 
+## Talking to an AI provider
+
+The rewrite actions will go through one client that speaks to any OpenAI-compatible provider. Until
+they arrive, `redpen chat` shows whether a provider answers. It sends exactly one message, only when
+you run it, and prints the answer:
+
+```sh
+redpen chat --provider local --message "Say hello."
+```
+
+**A local model** (`--provider local`) runs on this computer, so nothing leaves it. Redpen asks
+Ollama at `http://localhost:11434` which models it has, leaves out embedding models (their names
+contain `embed`), and uses the largest one up to 15B parameters (the 14B class, which Ollama
+reports as, for example, 14.8B); between two of the same size, the first by name. A local address
+must be this computer: `localhost`, `127.0.0.1` or `::1`. Any other address is refused before
+anything is sent.
+
+**Your own key** (`--provider own-key`) works with any OpenAI-compatible server. The command line
+reads the key, the base URL (for example `https://api.example.com/v1`) and the chat model from
+`REDPEN_OWN_KEY`, `REDPEN_OWN_BASE_URL` and `REDPEN_OWN_MODEL`; without all three it stops with
+`error: --provider own-key needs REDPEN_OWN_KEY, REDPEN_OWN_BASE_URL and REDPEN_OWN_MODEL.` The key
+is sent only in the `Authorization` header and is never printed or logged.
+
+The answer is one line, `{"content":"...","from_cache":false}`. When the call fails, the command
+prints `{"error":{"kind":"...","message":"..."}}`, repeats the message as `error: ...`, and exits
+with code 3. With Ollama stopped, for example:
+
+```json
+{"error":{"kind":"LocalNotRunning","message":"Ollama isn't running. Start it, or choose another provider."}}
+```
+
+The messages a provider call can end with:
+
+| Kind | Message |
+|---|---|
+| `NotConfigured` | Choose an AI provider in Settings → Providers. |
+| `OwnKeyRefused` | Your key was refused (401). Check it in Settings → Providers. |
+| `ModelUnknown` | Your provider does not know the model “example-chat” (404). Check the model name in Settings. |
+| `RateLimited` | Your provider says you are sending too many requests (429). Wait a moment and try again. |
+| `ProviderError` | Your provider had a problem (502). Try again later. |
+| `Timeout` | No answer from your own key's server after 30 seconds. Try again. (120 seconds for a local model) |
+| `Offline` | No connection. Rewrites need a connection or a local model; checking still works. |
+| `LocalNotRunning` | Ollama isn't running. Start it, or choose another provider. |
+| `LocalNoModel` | Ollama has no chat model installed. Install one in Ollama, or choose another provider. |
+| `LocalNotLocal` | A local model must run on this computer (localhost). |
+| `InvalidAnswer` | The AI answer could not be used. |
+
+When your own key's server or the local model times out, is busy (429) or fails (5xx), Redpen tries
+twice more, after half a second and then a second. A refused key or an unknown model is not
+retried. publik API calls are never retried, because a call it has started may still be charged.
+
+`--recording recording.json` answers from a file of recorded answers instead of the network (the
+format is in `docs/TESTING.md`), which is how the tests run.
+
+**What the app will keep.** When the app uses this client, answers are remembered on this computer
+for up to seven days (Settings → Privacy; at 0 days nothing is written to disk, but answers are
+still kept in memory until Redpen closes), so the same request never goes out twice; a count of
+calls per day and action is kept for the usage line in Settings; and, only if you turn on
+Settings → Privacy → "Keep a log", a log of exactly what was sent, deleted after seven days.
+Your own key is kept in `secrets.json` in your user's settings folder, readable only by you.
+
 ## Coming next
 
-In the order of `docs/ROADMAP.md`: the providers (publik API, your own key, a local model), the
-rewrite actions, reading and replacing a selection in any Windows app, the popup and Settings,
-Linux, the personal dictionary and style presets, the plagiarism check, and installers.
+In the order of `docs/ROADMAP.md`: publik API, the rewrite actions, reading and replacing a
+selection in any Windows app, the popup and Settings, Linux, the personal dictionary and style
+presets, the plagiarism check, and installers.

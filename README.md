@@ -7,8 +7,9 @@ check that needs the web.
 
 **Status: pre-alpha.** Local checking works from the command line: `redpen check` runs Harper on
 a text file, on this computer, in American, British, Australian, Canadian or Indian English, and
-`redpen fix-all` applies its fixes. Nothing rewrites yet, and the tray app only starts with a Quit
-menu. `docs/ROADMAP.md` lists what comes next, in order; `docs/PRODUCT.md` describes the finished
+`redpen fix-all` applies its fixes. `redpen chat` sends one message to your own key or to a local
+model (Ollama) through the client the rewrites will use. Nothing rewrites yet, and the tray app
+only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order; `docs/PRODUCT.md` describes the finished
 app; `docs/HANDBOOK.md` shows what works today.
 
 ## What it replaces
@@ -71,6 +72,18 @@ cargo run -q -p redpen-cli -- fix-all note.txt
 characters, bytes and UTF-16 units); `--disable spelling` (or `grammar`, `punctuation`, `style`)
 drops a category. `fix-all` prints the text with every first suggestion applied. A text over 20,000
 characters is refused. `docs/HANDBOOK.md` has examples.
+
+To check that a provider answers, send it one message:
+
+```sh
+cargo run -q -p redpen-cli -- chat --provider local --message "Say hello."
+```
+
+`--provider local` uses Ollama on this computer and picks its largest chat model up to 15B
+parameters; `--provider own-key` reads your key, base URL and model from `REDPEN_OWN_KEY`,
+`REDPEN_OWN_BASE_URL` and `REDPEN_OWN_MODEL` (any OpenAI-compatible server). The answer is printed
+as `{"content": "...", "from_cache": false}`; an error as `{"error": {"kind": "...", "message":
+"..."}}` with exit code 3.
 
 The free speed gate times Harper on a 1,000-word text from a release build (`docs/TESTING.md` §4):
 

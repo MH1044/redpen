@@ -1,0 +1,18 @@
+{
+  "format": "redpen-recording/1",
+  "entries": [
+    {
+      "request_sha256": "2fac1c064a10f694ef7caca6d959ebdba60b93e5b72afc02e8029971f1cbd321",
+      "source": "hand-written",
+      "request": {
+        "model": "fake-chat",
+        "messages": [{"role": "user", "content": "hello"}],
+        "max_tokens": 256,
+        "temperature": 0
+      },
+      "status": 200,
+      "headers": {},
+      "body": {"choices": [{"message": {"role": "assistant", "content": "hi"}}]}
+    }
+  ]
+}
