@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "23-34-grammar-bf087370",
+      "category": "grammar",
+      "harper_kind": "Word Order",
+      "message": "Consider moving the pronoun to before `no longer`.",
+      "span": {
+        "chars": [
+          23,
+          34
+        ],
+        "bytes": [
+          23,
+          34
+        ],
+        "utf16": [
+          23,
+          34
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "I no longer"
+        }
+      ]
+    }
+  ]
+}

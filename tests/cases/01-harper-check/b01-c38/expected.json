@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "6-17-style-f02c173e",
+      "category": "style",
+      "harper_kind": "Redundancy",
+      "message": "Using `more` and the comparative form of the adjective together is redundant.",
+      "span": {
+        "chars": [
+          6,
+          17
+        ],
+        "bytes": [
+          6,
+          17
+        ],
+        "utf16": [
+          6,
+          17
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "taller"
+        }
+      ]
+    }
+  ]
+}

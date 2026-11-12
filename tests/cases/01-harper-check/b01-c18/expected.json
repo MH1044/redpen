@@ -1,0 +1,34 @@
+{
+  "findings": [
+    {
+      "id": "0-26-grammar-03a5f998",
+      "category": "grammar",
+      "harper_kind": "Nonstandard",
+      "message": "The correct form is 'for all intents and purposes'.",
+      "span": {
+        "chars": [
+          0,
+          26
+        ],
+        "bytes": [
+          0,
+          26
+        ],
+        "utf16": [
+          0,
+          26
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "For all intents and purposes"
+        },
+        {
+          "kind": "replace",
+          "text": "To all intents and purposes"
+        }
+      ]
+    }
+  ]
+}

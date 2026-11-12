@@ -1,0 +1,42 @@
+{
+  "findings": [
+    {
+      "id": "7-18-style-4d394269",
+      "category": "style",
+      "harper_kind": "Word Choice",
+      "message": "`Unique` is absolute, so consider using `unique` alone or a more precise adjective such as `special`, `rare`, or `unusual`.",
+      "span": {
+        "chars": [
+          7,
+          18
+        ],
+        "bytes": [
+          7,
+          18
+        ],
+        "utf16": [
+          7,
+          18
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "very special"
+        },
+        {
+          "kind": "replace",
+          "text": "very rare"
+        },
+        {
+          "kind": "replace",
+          "text": "very unusual"
+        },
+        {
+          "kind": "replace",
+          "text": "unique"
+        }
+      ]
+    }
+  ]
+}

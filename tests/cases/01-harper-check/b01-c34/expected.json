@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "25-34-style-15d24023",
+      "category": "style",
+      "harper_kind": "Style",
+      "message": "When used as an adjective, `addictive` is the traditional and more f form.",
+      "span": {
+        "chars": [
+          25,
+          34
+        ],
+        "bytes": [
+          25,
+          34
+        ],
+        "utf16": [
+          25,
+          34
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "addictive"
+        }
+      ]
+    }
+  ]
+}

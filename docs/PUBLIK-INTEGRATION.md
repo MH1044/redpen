@@ -205,7 +205,7 @@ Placeholder values:
 
 | Placeholder | Value |
 |---|---|
-| `{dialect_name}` | `British English`, `American English`, `Australian English` or `Canadian English` (the Harper dialect list is confirmed at module 01); from module 08, `standard French` and so on when the text is reliably detected as another language |
+| `{dialect_name}` | `British English`, `American English`, `Australian English`, `Canadian English` or `Indian English` (Harper 3.0.0's five dialects, confirmed at module 01); from module 08, `standard French` and so on when the text is reliably detected as another language |
 | `{style}` | `Keep the author's own style.`; from module 08 also `Plain English: short sentences, everyday words, active voice, no jargon.`, `Academic: precise and formal, no contractions, hedged only where the text hedges.`, `Business: concise and courteous, the request or decision first, no filler.` |
 | `{text}`, `{instruction}` | the user's content, after redaction when on |
 

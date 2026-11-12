@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "19-28-grammar-6e8137f9",
+      "category": "grammar",
+      "harper_kind": "Malapropism",
+      "message": "Did you mean `alluded to`?",
+      "span": {
+        "chars": [
+          19,
+          28
+        ],
+        "bytes": [
+          19,
+          28
+        ],
+        "utf16": [
+          19,
+          28
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "alluded to"
+        }
+      ]
+    }
+  ]
+}

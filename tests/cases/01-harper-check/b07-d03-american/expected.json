@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "21-23-style-b8d31e85",
+      "category": "style",
+      "harper_kind": "Regionalism",
+      "message": "Use `in the cards` instead of `on the cards` in American English.",
+      "span": {
+        "chars": [
+          21,
+          23
+        ],
+        "bytes": [
+          21,
+          23
+        ],
+        "utf16": [
+          21,
+          23
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "in"
+        }
+      ]
+    }
+  ]
+}

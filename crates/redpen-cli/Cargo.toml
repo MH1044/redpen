@@ -20,12 +20,13 @@ harness = false
 
 [dependencies]
 redpen-core = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
+unicode-segmentation = { workspace = true }
 
 [dev-dependencies]
 ignore = { workspace = true }
 libtest-mimic = { workspace = true }
 regex = { workspace = true }
-serde = { workspace = true }
 tempfile = { workspace = true }
 tokio = { workspace = true }

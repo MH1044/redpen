@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "6-7-grammar-ca978112",
+      "category": "grammar",
+      "harper_kind": "Miscellaneous",
+      "message": "Incorrect indefinite article.",
+      "span": {
+        "chars": [
+          6,
+          7
+        ],
+        "bytes": [
+          6,
+          7
+        ],
+        "utf16": [
+          6,
+          7
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "an"
+        }
+      ]
+    }
+  ]
+}

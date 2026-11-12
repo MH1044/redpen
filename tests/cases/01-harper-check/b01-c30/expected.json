@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "15-16-punctuation-36a9e7f1",
+      "category": "punctuation",
+      "harper_kind": "Punctuation",
+      "message": "Don't use a space before a comma.",
+      "span": {
+        "chars": [
+          15,
+          16
+        ],
+        "bytes": [
+          15,
+          16
+        ],
+        "utf16": [
+          15,
+          16
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "remove",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

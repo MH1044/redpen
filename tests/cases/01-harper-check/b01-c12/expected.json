@@ -1,0 +1,34 @@
+{
+  "findings": [
+    {
+      "id": "0-5-grammar-577b7519",
+      "category": "grammar",
+      "harper_kind": "Grammar",
+      "message": "Did you mean `they're`?",
+      "span": {
+        "chars": [
+          0,
+          5
+        ],
+        "bytes": [
+          0,
+          5
+        ],
+        "utf16": [
+          0,
+          5
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "They're"
+        },
+        {
+          "kind": "replace",
+          "text": "They're "
+        }
+      ]
+    }
+  ]
+}

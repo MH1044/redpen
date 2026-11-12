@@ -1,0 +1,7 @@
+{
+  "error": {
+    "kind": "TooLong",
+    "message": "This selection is too long to check (over 20,000 characters). Select less text.",
+    "chars": 20001
+  }
+}

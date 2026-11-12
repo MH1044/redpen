@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "15-19-grammar-24ceef1c",
+      "category": "grammar",
+      "harper_kind": "Agreement",
+      "message": "Use the possessive pronoun `its` (without an apostrophe) to show ownership. The word `it's` (with an apostrophe) is a contraction of 'it is' or 'it has' and should not be used to indicate possession.",
+      "span": {
+        "chars": [
+          15,
+          19
+        ],
+        "bytes": [
+          15,
+          19
+        ],
+        "utf16": [
+          15,
+          19
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "its"
+        }
+      ]
+    }
+  ]
+}

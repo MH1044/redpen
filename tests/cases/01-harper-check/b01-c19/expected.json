@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "19-25-grammar-f99c7f69",
+      "category": "grammar",
+      "harper_kind": "Malapropism",
+      "message": "`Bellow` means to shout. You probably mean `below`.",
+      "span": {
+        "chars": [
+          19,
+          25
+        ],
+        "bytes": [
+          19,
+          25
+        ],
+        "utf16": [
+          19,
+          25
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "below"
+        }
+      ]
+    }
+  ]
+}

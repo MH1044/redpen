@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "20-26-style-dcb57642",
+      "category": "style",
+      "harper_kind": "Word Choice",
+      "message": "Use `affect` for the verb meaning to influence; `effect` usually names the result.",
+      "span": {
+        "chars": [
+          20,
+          26
+        ],
+        "bytes": [
+          20,
+          26
+        ],
+        "utf16": [
+          20,
+          26
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "affect"
+        }
+      ]
+    }
+  ]
+}

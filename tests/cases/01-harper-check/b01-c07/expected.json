@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "20-29-spelling-de19232d",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `mispelled` this way?",
+      "span": {
+        "chars": [
+          20,
+          29
+        ],
+        "bytes": [
+          20,
+          29
+        ],
+        "utf16": [
+          20,
+          29
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "misspelled"
+        },
+        {
+          "kind": "replace",
+          "text": "dispelled"
+        },
+        {
+          "kind": "replace",
+          "text": "miscalled"
+        }
+      ]
+    }
+  ]
+}

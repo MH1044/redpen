@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "7-15-spelling-f17fb9a0",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `seperate` this way?",
+      "span": {
+        "chars": [
+          7,
+          15
+        ],
+        "bytes": [
+          7,
+          15
+        ],
+        "utf16": [
+          7,
+          15
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "separate"
+        },
+        {
+          "kind": "replace",
+          "text": "sewerage"
+        },
+        {
+          "kind": "replace",
+          "text": "separated"
+        }
+      ]
+    }
+  ]
+}

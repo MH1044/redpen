@@ -141,7 +141,7 @@ by `publik.rs`.
 ```
 
 `dialect` defaults from the OS locale (en-GB British, en-US American, en-AU Australian, en-CA
-Canadian, anything else American). `chat` is `null` until the user chooses; values `publik` |
+Canadian, en-IN Indian, anything else American). `chat` is `null` until the user chooses; values `publik` |
 `own_key` | `local`. `search` is `null` until the user chooses; values `publik` | `own_key` (module
 09). `citation_style` is `apa7` | `mla9` | `chicago18`. `own_key` fields are empty strings by default;
 the example shows them filled.
@@ -245,7 +245,8 @@ Tauri commands (`app/src/ipc.ts` wraps each; errors are serialised `{kind, messa
 Events from core to UI: `popup://open {session_id}`, `status://publik {PublikStatus}`.
 
 CLI `redpen` (golden tests and the maintainer's scripts; never provisions Publik):
-`--version --json`; `chat --provider P [--recording R] --message S`; `check [--dialect D] [--disable C] FILE`; `fix-all FILE`;
+`--version --json`; `chat --provider P [--recording R] --message S`; `check [--dialect D] [--disable C]... FILE`; `fix-all [--dialect D] FILE`;
+`check-speed [--dialect D] [--runs N] FILE` (the `check-speed` gate's measurement, module 01);
 `rewrite --action A [--dialect D] [--style S] [--instruction S] [--redact] --provider
 fake|local|own-key|publik-env [--recording R] FILE`; `prompt --action A [--dialect D] [--style S]
 [--instruction S] [--redact] FILE` (prints the request body exactly as sent, after redaction); `redact FILE`;

@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "9-16-spelling-02f6c95a",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `recieve` this way?",
+      "span": {
+        "chars": [
+          9,
+          16
+        ],
+        "bytes": [
+          9,
+          16
+        ],
+        "utf16": [
+          9,
+          16
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "receive"
+        },
+        {
+          "kind": "replace",
+          "text": "relieve"
+        },
+        {
+          "kind": "replace",
+          "text": "recipe"
+        }
+      ]
+    }
+  ]
+}

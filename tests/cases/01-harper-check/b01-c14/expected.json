@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "13-18-grammar-5a3365e9",
+      "category": "grammar",
+      "harper_kind": "Grammar",
+      "message": "Use the past participle `written` instead of `wrote` when using compound tenses or passive voice.",
+      "span": {
+        "chars": [
+          13,
+          18
+        ],
+        "bytes": [
+          13,
+          18
+        ],
+        "utf16": [
+          13,
+          18
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "written"
+        }
+      ]
+    }
+  ]
+}

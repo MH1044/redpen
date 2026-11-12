@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "23-35-spelling-ec553e22",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean `regardless`?",
+      "span": {
+        "chars": [
+          23,
+          35
+        ],
+        "bytes": [
+          23,
+          35
+        ],
+        "utf16": [
+          23,
+          35
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "regardless"
+        }
+      ]
+    }
+  ]
+}

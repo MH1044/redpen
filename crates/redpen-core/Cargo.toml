@@ -10,6 +10,7 @@ publish = false
 
 [dependencies]
 async-trait = { workspace = true }
+harper-core = { workspace = true }
 secrecy = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -18,5 +19,6 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 
 [dev-dependencies]
+proptest = { workspace = true }
 tempfile = { workspace = true }
 toml = { workspace = true }

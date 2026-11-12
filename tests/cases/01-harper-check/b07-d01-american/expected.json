@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "4-10-spelling-d6838c35",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `colour` this way?",
+      "span": {
+        "chars": [
+          4,
+          10
+        ],
+        "bytes": [
+          4,
+          10
+        ],
+        "utf16": [
+          4,
+          10
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "color"
+        },
+        {
+          "kind": "replace",
+          "text": "cloud"
+        },
+        {
+          "kind": "replace",
+          "text": "collar"
+        }
+      ]
+    }
+  ]
+}

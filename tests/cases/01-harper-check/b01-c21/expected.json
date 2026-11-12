@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "30-34-grammar-21dec632",
+      "category": "grammar",
+      "harper_kind": "Eggcorn",
+      "message": "A change in direction or approach is a change of `tack`. Not `tact` (or `tacks` or `tacts`).",
+      "span": {
+        "chars": [
+          30,
+          34
+        ],
+        "bytes": [
+          30,
+          34
+        ],
+        "utf16": [
+          30,
+          34
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "tack"
+        }
+      ]
+    }
+  ]
+}

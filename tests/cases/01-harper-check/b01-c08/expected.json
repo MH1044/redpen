@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "0-17-spelling-3305917e",
+      "category": "spelling",
+      "harper_kind": "BoundaryError",
+      "message": "Use `each and every one` for referring to a group of people or things.",
+      "span": {
+        "chars": [
+          0,
+          17
+        ],
+        "bytes": [
+          0,
+          17
+        ],
+        "utf16": [
+          0,
+          17
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "Each and every one"
+        }
+      ]
+    }
+  ]
+}

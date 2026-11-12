@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "15-28-grammar-ee6adb6f",
+      "category": "grammar",
+      "harper_kind": "Eggcorn",
+      "message": "Did you mean `bated breath`?",
+      "span": {
+        "chars": [
+          15,
+          28
+        ],
+        "bytes": [
+          15,
+          28
+        ],
+        "utf16": [
+          15,
+          28
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "bated breath"
+        }
+      ]
+    }
+  ]
+}

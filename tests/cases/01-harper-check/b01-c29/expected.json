@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "25-26-punctuation-d03502c4",
+      "category": "punctuation",
+      "harper_kind": "Punctuation",
+      "message": "Use a space after a comma.",
+      "span": {
+        "chars": [
+          25,
+          26
+        ],
+        "bytes": [
+          25,
+          26
+        ],
+        "utf16": [
+          25,
+          26
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "insert_after",
+          "text": " "
+        }
+      ]
+    }
+  ]
+}

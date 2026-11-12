@@ -1,0 +1,25 @@
+{
+  "findings": [
+    {
+      "id": "0-233-style-24090b0e",
+      "category": "style",
+      "harper_kind": "Readability",
+      "message": "This sentence is 50 words long.",
+      "span": {
+        "chars": [
+          0,
+          233
+        ],
+        "bytes": [
+          0,
+          233
+        ],
+        "utf16": [
+          0,
+          233
+        ]
+      },
+      "suggestions": []
+    }
+  ]
+}

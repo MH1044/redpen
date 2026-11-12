@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "7-9-punctuation-6c179f21",
+      "category": "punctuation",
+      "harper_kind": "Formatting",
+      "message": "There are 2 spaces where there should be only one.",
+      "span": {
+        "chars": [
+          7,
+          9
+        ],
+        "bytes": [
+          7,
+          9
+        ],
+        "utf16": [
+          7,
+          9
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": " "
+        }
+      ]
+    }
+  ]
+}

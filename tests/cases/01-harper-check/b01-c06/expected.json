@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "3-9-spelling-4f9f0b8b",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `freind` this way?",
+      "span": {
+        "chars": [
+          3,
+          9
+        ],
+        "bytes": [
+          3,
+          9
+        ],
+        "utf16": [
+          3,
+          9
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "friend"
+        },
+        {
+          "kind": "replace",
+          "text": "fend"
+        },
+        {
+          "kind": "replace",
+          "text": "fiend"
+        }
+      ]
+    }
+  ]
+}

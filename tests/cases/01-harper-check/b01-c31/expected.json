@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "0-1-punctuation-de7d1b72",
+      "category": "punctuation",
+      "harper_kind": "Capitalization",
+      "message": "The first-person singular subject pronoun must be capitalized.",
+      "span": {
+        "chars": [
+          0,
+          1
+        ],
+        "bytes": [
+          0,
+          1
+        ],
+        "utf16": [
+          0,
+          1
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "I"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "17-19-grammar-ea325d76",
+      "category": "grammar",
+      "harper_kind": "Miscellaneous",
+      "message": "Incorrect indefinite article.",
+      "span": {
+        "chars": [
+          17,
+          19
+        ],
+        "bytes": [
+          17,
+          19
+        ],
+        "utf16": [
+          17,
+          19
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "a"
+        }
+      ]
+    }
+  ]
+}

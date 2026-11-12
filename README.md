@@ -5,9 +5,11 @@ instant local grammar checks, AI rewrites on request, and a plagiarism check wit
 and open source. Nothing you type leaves your computer unless you ask for a rewrite, or for a
 check that needs the web.
 
-**Status: pre-alpha.** Nothing checks or rewrites yet. The repository, the build, the tests and
-continuous integration exist, and the tray app starts with a Quit menu. `docs/ROADMAP.md` lists
-what comes next, in order; `docs/PRODUCT.md` describes the finished app.
+**Status: pre-alpha.** Local checking works from the command line: `redpen check` runs Harper on
+a text file, on this computer, in American, British, Australian, Canadian or Indian English, and
+`redpen fix-all` applies its fixes. Nothing rewrites yet, and the tray app only starts with a Quit
+menu. `docs/ROADMAP.md` lists what comes next, in order; `docs/PRODUCT.md` describes the finished
+app; `docs/HANDBOOK.md` shows what works today.
 
 ## What it replaces
 
@@ -58,7 +60,25 @@ The command-line tool:
 cargo run -q -p redpen-cli -- --version --json
 ```
 
-prints `{"name":"redpen","version":"0.1.0"}`.
+prints `{"name":"redpen","version":"0.1.0"}`. To check a UTF-8 text file on this computer:
+
+```sh
+cargo run -q -p redpen-cli -- check --dialect british note.txt
+cargo run -q -p redpen-cli -- fix-all note.txt
+```
+
+`check` prints Harper's findings as JSON (category, message, suggestions, and spans in
+characters, bytes and UTF-16 units); `--disable spelling` (or `grammar`, `punctuation`, `style`)
+drops a category. `fix-all` prints the text with every first suggestion applied. A text over 20,000
+characters is refused. `docs/HANDBOOK.md` has examples.
+
+The free speed gate times Harper on a 1,000-word text from a release build (`docs/TESTING.md` §4):
+
+```sh
+sh scripts/gates.sh check-speed
+```
+
+PowerShell: `powershell -File scripts/gates.ps1 check-speed`.
 
 ## Repository
 
@@ -68,7 +88,7 @@ prints `{"name":"redpen","version":"0.1.0"}`.
 | `crates/redpen-os` | Reading and replacing a selection on Windows and Linux |
 | `crates/redpen-cli` | The `redpen` command-line tool the golden tests drive, and the hygiene and recordings checks |
 | `app/` | The React and TypeScript interface; `app/src-tauri/` is the Tauri shell (tray, windows, commands) |
-| `scripts/` | `verify.sh` and `verify.ps1`, the icon generator |
+| `scripts/` | `verify.sh` and `verify.ps1`, `gates.sh` and `gates.ps1` (quality gates), the icon generator |
 | `tests/cases/` | Golden cases run through the `redpen` binary, with their recorded answers |
 | `docs/` | Product, architecture, Publik integration and contract, testing, roadmap, one spec per module, decision records, the handbook |
 

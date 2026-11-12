@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "2-6-style-bfbd0a44",
+      "category": "style",
+      "harper_kind": "Enhancement",
+      "message": "`Cant` is secret language or jargon. If that's not what you mean you should use `can't` here.",
+      "span": {
+        "chars": [
+          2,
+          6
+        ],
+        "bytes": [
+          2,
+          6
+        ],
+        "utf16": [
+          2,
+          6
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "can't"
+        }
+      ]
+    }
+  ]
+}

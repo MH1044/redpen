@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "26-30-style-a64e98ff",
+      "category": "style",
+      "harper_kind": "Regionalism",
+      "message": "Outside Indian English, prefer `to date`.",
+      "span": {
+        "chars": [
+          26,
+          30
+        ],
+        "bytes": [
+          26,
+          30
+        ],
+        "utf16": [
+          26,
+          30
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "to"
+        }
+      ]
+    }
+  ]
+}

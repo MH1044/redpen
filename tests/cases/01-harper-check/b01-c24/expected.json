@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "17-26-grammar-553b87a5",
+      "category": "grammar",
+      "harper_kind": "Repetition",
+      "message": "Did you mean to repeat this word?",
+      "span": {
+        "chars": [
+          17,
+          26
+        ],
+        "bytes": [
+          17,
+          26
+        ],
+        "utf16": [
+          17,
+          26
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "very"
+        }
+      ]
+    }
+  ]
+}

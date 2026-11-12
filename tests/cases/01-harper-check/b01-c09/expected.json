@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "0-4-spelling-baaf3fa4",
+      "category": "spelling",
+      "harper_kind": "BoundaryError",
+      "message": "`a lot` should be written as two words.",
+      "span": {
+        "chars": [
+          0,
+          4
+        ],
+        "bytes": [
+          0,
+          4
+        ],
+        "utf16": [
+          0,
+          4
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "A lot"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "10-12-grammar-b8d31e85",
+      "category": "grammar",
+      "harper_kind": "Usage",
+      "message": "Did you mean `by accident`?",
+      "span": {
+        "chars": [
+          10,
+          12
+        ],
+        "bytes": [
+          10,
+          12
+        ],
+        "utf16": [
+          10,
+          12
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "by"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "4-9-spelling-74284d9d",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `color` this way?",
+      "span": {
+        "chars": [
+          4,
+          9
+        ],
+        "bytes": [
+          4,
+          9
+        ],
+        "utf16": [
+          4,
+          9
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "colour"
+        },
+        {
+          "kind": "replace",
+          "text": "colon"
+        },
+        {
+          "kind": "replace",
+          "text": "clog"
+        }
+      ]
+    }
+  ]
+}

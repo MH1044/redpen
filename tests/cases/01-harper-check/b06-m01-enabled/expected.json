@@ -1,0 +1,64 @@
+{
+  "findings": [
+    {
+      "id": "9-16-spelling-02f6c95a",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `recieve` this way?",
+      "span": {
+        "chars": [
+          9,
+          16
+        ],
+        "bytes": [
+          9,
+          16
+        ],
+        "utf16": [
+          9,
+          16
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "receive"
+        },
+        {
+          "kind": "replace",
+          "text": "relieve"
+        },
+        {
+          "kind": "replace",
+          "text": "recipe"
+        }
+      ]
+    },
+    {
+      "id": "17-19-grammar-ea325d76",
+      "category": "grammar",
+      "harper_kind": "Miscellaneous",
+      "message": "Incorrect indefinite article.",
+      "span": {
+        "chars": [
+          17,
+          19
+        ],
+        "bytes": [
+          17,
+          19
+        ],
+        "utf16": [
+          17,
+          19
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "a"
+        }
+      ]
+    }
+  ]
+}

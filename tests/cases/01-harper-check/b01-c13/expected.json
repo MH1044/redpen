@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "7-11-grammar-bd7e8310",
+      "category": "grammar",
+      "harper_kind": "Grammar",
+      "message": "Use the past participle `gone` instead of `went` when using compound tenses or passive voice.",
+      "span": {
+        "chars": [
+          7,
+          11
+        ],
+        "bytes": [
+          7,
+          11
+        ],
+        "utf16": [
+          7,
+          11
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "gone"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "findings": [
+    {
+      "id": "0-3-punctuation-05df2478",
+      "category": "punctuation",
+      "harper_kind": "Punctuation",
+      "message": "Use `it's` (short for `it has` or `it is`) here, not the possessive `its`.",
+      "span": {
+        "chars": [
+          0,
+          3
+        ],
+        "bytes": [
+          0,
+          3
+        ],
+        "utf16": [
+          0,
+          3
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "It's"
+        },
+        {
+          "kind": "replace",
+          "text": "It has"
+        }
+      ]
+    }
+  ]
+}

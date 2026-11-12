@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "11-24-grammar-bf86020c",
+      "category": "grammar",
+      "harper_kind": "Usage",
+      "message": "`About` is redundant",
+      "span": {
+        "chars": [
+          11,
+          24
+        ],
+        "bytes": [
+          11,
+          24
+        ],
+        "utf16": [
+          11,
+          24
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "discuss"
+        }
+      ]
+    }
+  ]
+}

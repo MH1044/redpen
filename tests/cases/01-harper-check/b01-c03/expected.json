@@ -1,0 +1,38 @@
+{
+  "findings": [
+    {
+      "id": "15-25-spelling-7fe12f8b",
+      "category": "spelling",
+      "harper_kind": "Spelling",
+      "message": "Did you mean to spell `definately` this way?",
+      "span": {
+        "chars": [
+          15,
+          25
+        ],
+        "bytes": [
+          15,
+          25
+        ],
+        "utf16": [
+          15,
+          25
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "definitely"
+        },
+        {
+          "kind": "replace",
+          "text": "defiantly"
+        },
+        {
+          "kind": "replace",
+          "text": "delicately"
+        }
+      ]
+    }
+  ]
+}

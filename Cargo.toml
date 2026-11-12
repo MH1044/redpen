@@ -13,17 +13,21 @@ rust-version = "1.98"
 [workspace.dependencies]
 redpen-core = { path = "crates/redpen-core" }
 async-trait = "0.1"
+# Pinned exactly: the module 01 goldens were recorded against Harper's own linter at this version.
+harper-core = "=3.0.0"
 secrecy = "0.10"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.11"
 thiserror = "2"
 tokio = { version = "1", features = ["rt", "rt-multi-thread", "time", "macros"] }
+unicode-segmentation = "1"
 tauri = { version = "2", features = ["tray-icon"] }
 tauri-build = { version = "2", features = [] }
 # test-only
 ignore = "0.4"
 libtest-mimic = "0.8"
+proptest = "1"
 regex = "1"
 tempfile = "3"
 toml = "1"

@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "2-10-style-110a307c",
+      "category": "style",
+      "harper_kind": "Word Choice",
+      "message": "Use `have` rather than `of` here.",
+      "span": {
+        "chars": [
+          2,
+          10
+        ],
+        "bytes": [
+          2,
+          10
+        ],
+        "utf16": [
+          2,
+          10
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "could have"
+        }
+      ]
+    }
+  ]
+}

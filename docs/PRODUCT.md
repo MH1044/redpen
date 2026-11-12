@@ -57,7 +57,7 @@ copy is attempted and the popup shows the refusal message (docs/ARCHITECTURE.md 
 **F2 Local checks** (modules 01, 06). Given a captured text, the popup lists Harper's findings
 with category (Spelling, Grammar, Punctuation, Style), message and one-click fixes, with no
 provider set up and offline. Applying a fix re-checks the text. Dialect (British, American,
-Australian, Canadian) and categories are set in Settings. Applying every suggestion twice gives the
+Australian, Canadian, Indian) and categories are set in Settings. Applying every suggestion twice gives the
 same text as applying them once.
 
 **F3 Rewrite actions** (modules 04, 06). Fix grammar, Clearer, Shorter, More formal, Friendlier

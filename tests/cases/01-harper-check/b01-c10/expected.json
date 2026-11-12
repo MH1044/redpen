@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "4-9-grammar-df768209",
+      "category": "grammar",
+      "harper_kind": "Agreement",
+      "message": "The form of the verb must agree in grammatical number with the pronoun.",
+      "span": {
+        "chars": [
+          4,
+          9
+        ],
+        "bytes": [
+          4,
+          9
+        ],
+        "utf16": [
+          4,
+          9
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "doesn't"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "0-7-grammar-cb70fb7d",
+      "category": "grammar",
+      "harper_kind": "Repetition",
+      "message": "Did you mean to repeat this word?",
+      "span": {
+        "chars": [
+          0,
+          7
+        ],
+        "bytes": [
+          0,
+          7
+        ],
+        "utf16": [
+          0,
+          7
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "The"
+        }
+      ]
+    }
+  ]
+}

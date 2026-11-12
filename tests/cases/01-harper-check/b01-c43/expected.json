@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "21-24-style-88eb5a7e",
+      "category": "style",
+      "harper_kind": "Regionalism",
+      "message": "If this is the idiom about abandoning a plan, it's more usual to leave out `of` in American English",
+      "span": {
+        "chars": [
+          21,
+          24
+        ],
+        "bytes": [
+          21,
+          24
+        ],
+        "utf16": [
+          21,
+          24
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "remove",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

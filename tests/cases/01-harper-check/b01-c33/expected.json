@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "19-20-punctuation-36a9e7f1",
+      "category": "punctuation",
+      "harper_kind": "Formatting",
+      "message": "Unnecessary space at the end of the sentence.",
+      "span": {
+        "chars": [
+          19,
+          20
+        ],
+        "bytes": [
+          19,
+          20
+        ],
+        "utf16": [
+          19,
+          20
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "remove",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

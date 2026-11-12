@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "7-11-style-193c45b5",
+      "category": "style",
+      "harper_kind": "Regionalism",
+      "message": "Indian English prefers `take a look` over `have a look`.",
+      "span": {
+        "chars": [
+          7,
+          11
+        ],
+        "bytes": [
+          7,
+          11
+        ],
+        "utf16": [
+          7,
+          11
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "take"
+        }
+      ]
+    }
+  ]
+}

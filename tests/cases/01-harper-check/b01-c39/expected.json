@@ -1,0 +1,34 @@
+{
+  "findings": [
+    {
+      "id": "19-39-style-0d90bdac",
+      "category": "style",
+      "harper_kind": "Redundancy",
+      "message": "The time period is redundant because it repeats what's already specified by the AM/PM indicator.",
+      "span": {
+        "chars": [
+          19,
+          39
+        ],
+        "bytes": [
+          19,
+          39
+        ],
+        "utf16": [
+          19,
+          39
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": " PM"
+        },
+        {
+          "kind": "replace",
+          "text": " in the afternoon"
+        }
+      ]
+    }
+  ]
+}

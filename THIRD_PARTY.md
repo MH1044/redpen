@@ -11,6 +11,8 @@ adds them.
 | tauri | Apache-2.0 OR MIT | The desktop shell: tray, windows, commands |
 | tauri-build | Apache-2.0 OR MIT | Build-time setup of the Tauri crate |
 | async-trait | MIT OR Apache-2.0 | The async `HttpTransport` and `Sleeper` traits |
+| harper-core | Apache-2.0 | Grammar, spelling and style checking on this computer, pinned at `=3.0.0` (module 01); it brings Harper's `harper-brill`, `harper-pos-utils` and `harper-thesaurus` (Apache-2.0) |
+| unicode-segmentation | MIT OR Apache-2.0 | UAX #29 words: the 1,000-word text of the `check-speed` gate (later: word counts and sentences) |
 | secrecy | Apache-2.0 OR MIT | Header values that hold a key and never print it |
 | serde | MIT OR Apache-2.0 | Serialisation of recordings, settings and command results |
 | serde_json | MIT OR Apache-2.0 | JSON bodies, recordings and the command-line tool's output |
@@ -19,6 +21,7 @@ adds them.
 | tokio | MIT | The async runtime and the production `Sleeper` |
 | ignore (tests only) | Unlicense OR MIT | The source-hygiene test's fallback walk, honouring `.gitignore` |
 | libtest-mimic (tests only) | MIT OR Apache-2.0 | One test per golden case directory |
+| proptest (tests only) | MIT OR Apache-2.0 | Generated texts with a fixed seed in the checking tests (module 01) |
 | regex (tests only) | MIT OR Apache-2.0 | The source-hygiene test's patterns |
 | tempfile (tests only) | MIT OR Apache-2.0 | Temporary directories in tests |
 | toml (tests only) | MIT OR Apache-2.0 | Reading `deny.toml` in tests |
@@ -48,8 +51,17 @@ adds them.
 
 ## Models
 
-None. Redpen ships no model weights: checking uses Harper's rules (module 01), and rewrites go to
-the provider the user chose.
+Redpen trains no model and ships no weights of its own; rewrites go to the provider the user chose.
+Harper (module 01) compiles its own data into the crates it is built from, and Redpen ships it
+unchanged as part of `harper-core`:
+
+| Item | Licence | Source | Used for |
+|---|---|---|---|
+| Harper's part-of-speech tagger and noun-phrase chunker: Brill rule sets and a small Burn model (`finished_chunker/model.mpk`, about 0.8 MB) | Apache-2.0 | the `harper-brill` crate, 3.0.0, from the Harper project | Tagging words so Harper's grammar rules can match |
+| Harper's thesaurus and word-frequency list | Apache-2.0 | the `harper-thesaurus` crate, 3.0.0, from the Harper project | Word-choice suggestions |
+| Harper's curated English dictionary | Apache-2.0 | `harper-core` 3.0.0 | Spelling |
+
+Harper's repository does not name the corpus its tagger and chunker were trained on.
 
 ## Datasets
 

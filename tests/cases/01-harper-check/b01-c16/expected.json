@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "8-18-grammar-9de7339c",
+      "category": "grammar",
+      "harper_kind": "Usage",
+      "message": "Did you mean `supposed to`?",
+      "span": {
+        "chars": [
+          8,
+          18
+        ],
+        "bytes": [
+          8,
+          18
+        ],
+        "utf16": [
+          8,
+          18
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "supposed to"
+        }
+      ]
+    }
+  ]
+}

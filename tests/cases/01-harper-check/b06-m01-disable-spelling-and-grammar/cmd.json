@@ -1,0 +1,1 @@
+{"args":["check","--dialect","american","--disable","spelling","--disable","grammar","input.txt"]}

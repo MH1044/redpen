@@ -1,0 +1,30 @@
+{
+  "findings": [
+    {
+      "id": "10-13-spelling-57a49948",
+      "category": "spelling",
+      "harper_kind": "Typo",
+      "message": "Did you mean the definite article?",
+      "span": {
+        "chars": [
+          10,
+          13
+        ],
+        "bytes": [
+          10,
+          13
+        ],
+        "utf16": [
+          10,
+          13
+        ]
+      },
+      "suggestions": [
+        {
+          "kind": "replace",
+          "text": "the"
+        }
+      ]
+    }
+  ]
+}
