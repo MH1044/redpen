@@ -1,0 +1,12 @@
+{
+  "about": "429: the app shows error.message and does not retry (docs/PUBLIK-CONTRACT.md §8). Invented message.",
+  "status": 429,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "rate_limited",
+      "code": "rate_limited",
+      "message": "This computer is sending requests too quickly. Wait a minute, then try again."
+    }
+  }
+}

@@ -64,7 +64,7 @@ app/
     Cargo.toml, build.rs, tauri.conf.json, capabilities/, publik-app-token.txt
     src/lib.rs, main.rs       wiring: state, windows, tray, hotkeys, commands; `main` first runs
                               the Publik self-test when `PUBLIK_SELF_TEST` is set (module 03)
-    src/publik.rs             the official reference module, adapted (`// redpen:` markers)
+    src/publik.rs             the publik API module, written from docs/PUBLIK-CONTRACT.md (ADR-0010)
     src/commands/             one file per command group in §5
     src/bin/publik-proof.rs, redpen-gates.rs
     tests/03_publik.rs
@@ -317,8 +317,8 @@ output for the session's text, the fake key and the process name.
 2. Publik housekeeping: `POST /installs` (after consent), `POST /installs/revoke` (Disconnect),
    `GET /wallet` at start and when Settings opens, only while publik API is the chosen AI provider
    and a credential exists; never while own key or local is chosen. With `PUBLIK_SELF_TEST` set
-   (the maintainer's built-app check, never in normal use), one `POST /installs` at start, then the
-   app exits.
+   (the maintainer's built-app check, never in normal use), one `POST /installs` and one
+   `GET /wallet` at start, then the app exits.
 3. Own key Test: `GET {base_url}/models`. Local: `GET http://localhost:11434/api/tags`.
 4. Web search (module 09), only when Plagiarism check or the search key's Test is pressed:
    `POST {publik}/search`, or `GET https://api.search.brave.com/res/v1/web/search` with the user's
@@ -339,11 +339,12 @@ Module 00 writes these ADRs in `docs/adr/`.
 | 0002 Licence | MIT OR Apache-2.0 | Accepted | GPL (would block permissive reuse of the core) |
 | 0003 Capture | the clipboard route with UI Automation checks; UIA TextPattern later | Accepted | UIA TextPattern only (many apps do not implement it); per-app plugins (not system-wide) |
 | 0004 Prompts and the guard | versioned prompt files; minimal-edit guard for Fix grammar | Accepted | editing prompts in place (goldens would lie); no guard (models over-edit) |
-| 0005 Publik module | reference `publik.rs` copied into `app/src-tauri/src/publik.rs`, reqwest transport, one AI client | Accepted | a separate `redpen-publik` crate (allowed by the contract; not needed with one consumer) |
+| 0005 Publik module | reference `publik.rs` copied into `app/src-tauri/src/publik.rs`, reqwest transport, one AI client | Superseded by 0010 | a separate `redpen-publik` crate (allowed by the contract; not needed with one consumer) |
 | 0006 No streaming in v1 | answers are shown after validation | Accepted | streaming partial JSON (shows unvalidated text) |
 | 0007 Name and slug | Redpen, slug `redpen` | Maintainer decides at module 03, before listing | none yet |
 | 0008 Platforms | Windows and Linux; no macOS build while GSpot (AGPL-3.0, on Publik) covers macOS | Accepted | a macOS build (would remake GSpot) |
 | 0009 Plagiarism from snippets | exact-phrase web search, at most 8 phrases, matched against result snippets on this computer; result pages never fetched | Accepted | fetching pages (a request per result, arbitrary HTML); scraping a search engine without a key (fragile, against its terms); an overall originality percentage (implies a precision the method lacks) |
+| 0010 Publik module from the contract | `publik.rs` written from docs/PUBLIK-CONTRACT.md; no sign-in gate and no usage telemetry; the rest of 0005 stands | Accepted | copying the reference (it states no licence, and its mandatory sign-in and telemetry break the privacy promises) |
 
 ## 10. Platforms
 

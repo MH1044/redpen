@@ -1,31 +1,44 @@
 //! One OpenAI-compatible chat client for every provider (docs/modules/02-provider-layer.md):
-//! the user's own key, a local model, the fake provider, and publik API from module 03.
+//! the user's own key, a local model, the fake provider, and publik API (module 03).
 //!
 //! [`AiClient::chat`] sends `POST {base_url}/chat/completions` with `{model, messages,
 //! max_tokens, temperature}`, not streamed, and returns `choices[0].message.content`. Around it:
 //! the answer cache ([`cache`]), retries for the own key and local only ([`retry`]), the
 //! localhost rule and Ollama's model choice ([`local`]), daily usage counts and the opt-in sent
 //! log in `redpen.db`, and errors a user can act on ([`AiError`]).
+//!
+//! For publik API (module 03): the tier rule ([`tier`]), the idempotency key every chat call
+//! carries ([`idempotency_key`]), the mapping of its errors ([`publik_errors`]), the
+//! [`ProviderResolver`] the app implements over Settings and the credential ([`resolver`]), and
+//! the web search answer ([`search`]).
 
 pub mod cache;
 pub mod client;
 pub mod errors;
 pub mod local;
+pub mod publik_errors;
 pub mod resolved;
+pub mod resolver;
 pub mod retry;
+pub mod search;
+pub mod tier;
 
 use std::fmt;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
-pub use cache::cache_key;
+pub use cache::{cache_key, idempotency_key};
 pub use client::{AiClient, PrivacyOptions, ProviderTest};
 pub use errors::{AiError, OWN_KEY_RATE_LIMITED};
 pub use local::{LocalModel, pick_local_model};
+pub use publik_errors::{map_publik_error, top_up_url_from_402};
 pub use resolved::{ProviderKind, ResolvedProvider};
+pub use resolver::{FixedResolver, ProviderResolver};
 pub use retry::RETRY_DELAYS;
+pub use search::{SearchError, SearchOutcome, SearchResult};
 pub use secrecy::{ExposeSecret, SecretString};
+pub use tier::{ClaimState, RewriteQuality, TierContext, publik_tier};
 
 /// What a call is for. `usage_daily.feature` and `sent_log.feature` hold the kebab-case name.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -111,7 +124,10 @@ pub struct ChatCall {
     /// The input fields of the cache key (docs/PUBLIK-INTEGRATION.md §5).
     pub cache_input: serde_json::Value,
     pub cache: CachePolicy,
-    /// The n-th Try again after an invalid answer; module 03 uses it for the idempotency key.
+    /// The n-th Try again after an invalid answer (0 for a first call). On publik API it sets
+    /// the idempotency key ([`idempotency_key`]); above 0 the call is always sent, never
+    /// answered from the cache, since the cached answer is the one that failed. A valid answer
+    /// is still stored under the cache key K, which never includes it.
     pub validation_retry: u32,
 }
 
@@ -130,7 +146,7 @@ pub struct ChatReply {
 }
 
 /// Reads the headers of every chat response. Module 03 implements it for publik API's status
-/// headers; the default reads nothing.
+/// headers (`PublikStatusSink` in the app); the default reads nothing.
 pub trait StatusSink: Send + Sync {
     /// Called once per response (each attempt, any status). Returns the call's charge in
     /// micro-dollars, which `usage_daily.charge_micros` adds up.
@@ -143,6 +159,12 @@ pub trait StatusSink: Send + Sync {
     ) -> Option<u64> {
         let _ = (kind, feature, status, headers);
         None
+    }
+
+    /// Called once when a chat call fails, with the error the caller receives, so the publik
+    /// status can keep the one link of a 402. The default ignores it.
+    fn on_error(&self, kind: ProviderKind, error: &AiError) {
+        let _ = (kind, error);
     }
 }
 

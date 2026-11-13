@@ -1,0 +1,23 @@
+{
+  "about": "POST /chat/completions, 200, carrying all eight status headers of docs/PUBLIK-CONTRACT.md §7: a balance of $3.12, a charge of 210 micro-dollars, a linked computer, $0.05 of starter balance left, $1.234 used of a $5.00 weekly budget. The answer is the word ok. Every value is invented.",
+  "status": 200,
+  "headers": {
+    "x-publik-balance": "3120000",
+    "x-publik-charge-micros": "210",
+    "x-publik-request-id": "req_fake_0001",
+    "x-publik-claim-state": "claimed",
+    "x-publik-starter-remaining": "50000",
+    "x-publik-week-used": "1234000",
+    "x-publik-week-budget": "5000000",
+    "x-publik-week-resets-at": "2026-11-16T00:00:00Z"
+  },
+  "body": {
+    "choices": [
+      {
+        "index": 0,
+        "message": {"role": "assistant", "content": "ok"},
+        "finish_reason": "stop"
+      }
+    ]
+  }
+}

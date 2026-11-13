@@ -1,0 +1,27 @@
+{
+  "about": "POST /installs, 201: a new key for a new install on a $0.00 balance, not yet linked (docs/PUBLIK-CONTRACT.md §5). Every value is invented. cost_sentence and add_credit_url appear both at the top level and where the contract's body nests them, with the same text.",
+  "status": 201,
+  "headers": {},
+  "body": {
+    "key": "pk_live_a",
+    "key_id": "key_fake_0001",
+    "base_url": "https://publikhq.com/api/v1",
+    "install_id": "5f0c8a52-6e0b-4c55-9a3e-2a3f1d9b7c11",
+    "claim_url": "https://publikhq.com/claim/fake-claim-token",
+    "claim_state": "anonymous",
+    "balance_micros": 0,
+    "add_credit_url": "https://publikhq.com/account/add-credit",
+    "cost_sentence": "A typical rewrite costs less than one cent, paid from this computer's publik balance.",
+    "wallet": {
+      "balance_micros": 0,
+      "add_credit_url": "https://publikhq.com/account/add-credit",
+      "top_up_url": "https://publikhq.com/claim/fake-claim-token",
+      "claim_state": "anonymous"
+    },
+    "disclosure": {
+      "version": 1,
+      "cost": "A typical rewrite costs less than one cent, paid from this computer's publik balance.",
+      "data_path": "Requests go through publik's servers to the AI provider."
+    }
+  }
+}

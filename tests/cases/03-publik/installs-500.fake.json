@@ -1,0 +1,11 @@
+{
+  "about": "POST /installs, 500 with no error.message, so the app says \"publik API could not set up this computer (500). Use your own key for now.\" (docs/PUBLIK-CONTRACT.md §5; module 03, acceptance test 11).",
+  "status": 500,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "server_error",
+      "code": "internal_error"
+    }
+  }
+}

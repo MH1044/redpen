@@ -229,7 +229,8 @@ fn t10_deny_toml_allows_no_copyleft_licence() {
     }
 }
 
-// Bullet 13: every document the Scope names exists; docs/adr/ holds ADRs 0001 to 0009, each
+// Bullet 13: every document the Scope names exists; docs/adr/ holds ADRs 0001 to 0010 (0010 added
+// at module 03, superseding 0005), each
 // with a Status line and listed in the index; CONTRIBUTING.md carries the publik API block.
 #[test]
 fn t13_documents_and_adrs_exist() {
@@ -262,7 +263,7 @@ fn t13_documents_and_adrs_exist() {
         })
         .collect();
     adr_files.sort();
-    assert_eq!(adr_files.len(), 9, "ADR files: {adr_files:?}");
+    assert_eq!(adr_files.len(), 10, "ADR files: {adr_files:?}");
     for (i, name) in adr_files.iter().enumerate() {
         assert!(
             name.starts_with(&format!("{:04}-", i + 1)),
@@ -277,8 +278,13 @@ fn t13_documents_and_adrs_exist() {
             .lines()
             .find(|line| line.contains("Status:"))
             .unwrap_or_else(|| panic!("{name} has no Status: line"));
-        // 0007 (name and slug) waits for the maintainer; the rest are decided.
-        let expected = if i + 1 == 7 { "Proposed" } else { "Accepted" };
+        // 0005 is superseded by 0010; 0007 (name and slug) waits for the maintainer; the rest are
+        // decided.
+        let expected = match i + 1 {
+            5 => "Superseded by ADR-0010",
+            7 => "Proposed",
+            _ => "Accepted",
+        };
         assert!(
             status.contains(expected),
             "{name}: expected {expected}, found {status:?}"

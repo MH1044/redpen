@@ -9,11 +9,12 @@ reverse, each with what was rejected and why. `docs/ARCHITECTURE.md` §9 summari
 | [0002](0002-licence.md) | Licence: MIT OR Apache-2.0 | Accepted |
 | [0003](0003-capture.md) | Capture: the clipboard route with UI Automation checks | Accepted |
 | [0004](0004-prompts-and-the-guard.md) | Prompts and the guard: versioned prompt files, a minimal-edit guard for Fix grammar | Accepted |
-| [0005](0005-publik-module.md) | Publik module: the reference module in the app crate, one AI client | Accepted |
+| [0005](0005-publik-module.md) | Publik module: the reference module in the app crate, one AI client | Superseded by ADR-0010 |
 | [0006](0006-no-streaming.md) | No streaming in v1: answers are shown after validation | Accepted |
 | [0007](0007-name-and-slug.md) | Name and slug: Redpen, `redpen` | Proposed (maintainer decides at module 03, before listing) |
 | [0008](0008-platforms.md) | Platforms: Windows and Linux, no macOS build | Accepted |
 | [0009](0009-plagiarism-from-snippets.md) | Plagiarism from snippets: exact-phrase search, result pages never fetched | Accepted |
+| [0010](0010-publik-module-from-the-contract.md) | Publik module written from the contract, without a sign-in gate or usage telemetry | Accepted |
 
 ## Rules
 

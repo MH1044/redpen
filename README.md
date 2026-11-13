@@ -11,9 +11,12 @@ a text file, on this computer, in American, British, Australian, Canadian or Ind
 model (Ollama) through the client the rewrites will use. On Windows, the capture the shortcut will
 use is built: it reads the selection in the app in front and types a result back through the
 clipboard, refuses password fields, password managers and windows running as administrator before
-any key is sent, and puts the clipboard back as it was. Nothing rewrites yet, no shortcut is
-registered, and the tray app only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order; `docs/PRODUCT.md` describes the finished
-app; `docs/HANDBOOK.md` shows what works today.
+any key is sent, and puts the clipboard back as it was. The publik API set-up is built and tested
+against a fake server: consent before anything is sent, a per-computer key that never leaves the
+core, the balance in dollars in the tray menu, and one message and one way out for each error;
+live calls wait for the project's app token. Nothing rewrites yet, no shortcut is registered, and
+the tray app only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order;
+`docs/PRODUCT.md` describes the finished app; `docs/HANDBOOK.md` shows what works today.
 
 ## What it replaces
 
@@ -56,7 +59,15 @@ cargo run -p redpen-app
 ```
 
 `cargo run -p redpen-app -- --smoke` starts it, waits for the hidden interface window to report
-ready, and exits 0: the launch check continuous integration runs.
+ready, and exits 0: the launch check continuous integration runs. With `PUBLIK_SELF_TEST=1` set,
+the app instead prints one `publik self-test:` line and exits before opening anything
+(`docs/HANDBOOK.md`, publik API).
+
+Maintainer only, and it spends money: `sh scripts/publik-proof.sh` (PowerShell:
+`powershell -File scripts/publik-proof.ps1`) makes one real publik API call and prints the
+reply, the charge and the names of the `x-publik-*` headers, never the key or the balance;
+`--models`, `--probe-json` and `--search` (one cent, after its own question) check the rest.
+Without the app token it says so and sends nothing.
 
 The command-line tool:
 
@@ -111,8 +122,8 @@ PowerShell: `powershell -File scripts/gates.ps1 check-speed`.
 | `crates/redpen-core` | The platform-free core: checking, rewriting, plagiarism matching, providers, storage. The clock and the network are injected, so tests run with fakes |
 | `crates/redpen-os` | Reading and replacing a selection on Windows and Linux, and `redpen-testwin`, the helper window its Windows tests type into |
 | `crates/redpen-cli` | The `redpen` command-line tool the golden tests drive, and the hygiene and recordings checks |
-| `app/` | The React and TypeScript interface; `app/src-tauri/` is the Tauri shell (tray, windows, commands) |
-| `scripts/` | `verify.sh` and `verify.ps1`, `gates.sh` and `gates.ps1` (quality gates), the icon generator |
+| `app/` | The React and TypeScript interface; `app/src-tauri/` is the Tauri shell (tray, windows, commands) and the publik API module |
+| `scripts/` | `verify.sh` and `verify.ps1`, `gates.sh` and `gates.ps1` (quality gates), `publik-proof.sh` and `publik-proof.ps1` (one real publik API call, maintainer only), the icon generator |
 | `tests/cases/` | Golden cases run through the `redpen` binary, with their recorded answers |
 | `docs/` | Product, architecture, Publik integration and contract, testing, roadmap, one spec per module, decision records, the handbook |
 

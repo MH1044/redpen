@@ -1,0 +1,12 @@
+{
+  "about": "500: \"publik API 500: The model returned an error.\" (module 03, the AiError table). The message is the table's.",
+  "status": 500,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "server_error",
+      "code": "upstream_error",
+      "message": "The model returned an error."
+    }
+  }
+}

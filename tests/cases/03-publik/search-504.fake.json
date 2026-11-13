@@ -1,0 +1,12 @@
+{
+  "about": "POST /search, 504: the search provider did not answer in time and nothing was charged (docs/PUBLIK-CONTRACT.md §6a). Invented message.",
+  "status": 504,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "provider_error",
+      "code": "search_timeout",
+      "message": "The search provider did not answer in time."
+    }
+  }
+}

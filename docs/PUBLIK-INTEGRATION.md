@@ -45,12 +45,12 @@ so and names the contract section. Read both before touching modules 02, 03, 04 
   in the build environment overrides the token file. Until the skill has run, the file holds one
   comment line and no `pat_` token; the build then shows "This build has no publik API app token.
   Use your own key for now."
-- **Reference module**: `https://publikhq.com/sdk/publik.rs.md`, copied verbatim into
-  `app/src-tauri/src/publik.rs` at module 03. Only `APP_SLUG = "redpen"`,
-  `APP_VERSION = env!("CARGO_PKG_VERSION")` and the adaptations below change. Each adaptation is
-  marked in the file with a `// redpen:` comment and listed in module 03's Design notes, so a
-  future reference update can be merged by diff. The reference's `self_test` is called first thing
-  in `main` (module 03).
+- **The module**: `app/src-tauri/src/publik.rs`, written for Redpen at module 03 from
+  `docs/PUBLIK-CONTRACT.md` and not copied from Publik's reference module, which states no licence
+  and has gained a start-up sign-in gate and usage telemetry that Redpen's privacy promises rule
+  out (ADR-0010). It keeps the contract's public names, `APP_SLUG = "redpen"` and
+  `APP_VERSION = env!("CARGO_PKG_VERSION")`, and follows the rules below. Its `self_test` is called
+  first thing in `main` (module 03).
 
 | # | Adaptation | Why |
 |---|---|---|
@@ -63,10 +63,10 @@ so and names the contract section. Read both before touching modules 02, 03, 04 
 | A7 | `dialects: ["chat_completions"]` in the `/installs` body | Redpen only speaks Chat Completions |
 | A8 | The reference's `search()` goes over `HttpTransport` too and returns `SearchOutcome`; 502 and 504 become `SearchError::ProviderFailed` | Contract §6a; module 09 needs one fakeable shape |
 
-If the reference already does any of these, the adaptation is a no-op and Design notes say so. If
-the reference's function names differ from the ones used in this file (`DISCLOSURE`,
-`resolve_provider`, `provision`, `credential_path`, `balance_line`, `top_up_url_from_402`,
-`self_test`, `search`), the reference wins and module 03 records the mapping.
+These are design rules for the module Redpen writes from the contract (ADR-0010); module 03's
+Design notes name the code that implements each. Its public names are the contract's
+(`DISCLOSURE`, `resolve_provider`, `provision`, `credential_path`, `balance_line`,
+`top_up_url_from_402`, `self_test`, `search`).
 
 **Before implementing any module that touches Publik (03, 04, 09)**: fetch the three contract sources
 (and, for 03 and 09, `https://publikhq.com/skills/search.md`) again with `curl` (raw) and record
@@ -551,7 +551,7 @@ acceptance test 11). Redpen's own tests, each with its fake responses in the nam
 - Web search: POST /search {"q","count"}; one cent a search; the user's own search key, when set, comes first
 - Redpen products: ai.chat, search
 - Redpen tiers: publik-fast for Fix grammar; publik-balanced for Clearer, Shorter, More formal, Friendlier and Custom; publik-smart for those five only when Rewrite quality is Best and the computer is linked
-- The module lives at app/src-tauri/src/publik.rs; every change to the reference is marked `// redpen:`
+- The module lives at app/src-tauri/src/publik.rs, written from docs/PUBLIK-CONTRACT.md (ADR-0010): no sign-in gate, no usage telemetry
 - No retries on Publik calls; Try again is a button. Rewrite answers and search results are cached on disk for at most 7 days
 - Plagiarism check: at most 8 searches per check, quoted phrases of at most 12 words, snippets only; result pages are never fetched
 - Chat always sends a tier. Idempotency key: first 32 hex of the cache key, or of SHA-256(<key>:<n>) after n invalid answers

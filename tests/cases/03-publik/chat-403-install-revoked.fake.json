@@ -1,0 +1,12 @@
+{
+  "about": "403 install_revoked on a call: the same as a 401, publik API disconnected this computer (docs/PUBLIK-CONTRACT.md §8). Invented message.",
+  "status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "install_revoked",
+      "code": "install_revoked",
+      "message": "This install was revoked."
+    }
+  }
+}

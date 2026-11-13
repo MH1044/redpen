@@ -1,0 +1,27 @@
+{
+  "about": "POST /installs, 201: as installs-201, but the install starts with $0.05 (balance_micros 50000), so the pending action runs at once (docs/PUBLIK-INTEGRATION.md §4). Every value is invented.",
+  "status": 201,
+  "headers": {},
+  "body": {
+    "key": "pk_live_a",
+    "key_id": "key_fake_0002",
+    "base_url": "https://publikhq.com/api/v1",
+    "install_id": "5f0c8a52-6e0b-4c55-9a3e-2a3f1d9b7c11",
+    "claim_url": "https://publikhq.com/claim/fake-claim-token",
+    "claim_state": "anonymous",
+    "balance_micros": 50000,
+    "add_credit_url": "https://publikhq.com/account/add-credit",
+    "cost_sentence": "A typical rewrite costs less than one cent, paid from this computer's publik balance.",
+    "wallet": {
+      "balance_micros": 50000,
+      "add_credit_url": "https://publikhq.com/account/add-credit",
+      "top_up_url": "https://publikhq.com/claim/fake-claim-token",
+      "claim_state": "anonymous"
+    },
+    "disclosure": {
+      "version": 1,
+      "cost": "A typical rewrite costs less than one cent, paid from this computer's publik balance.",
+      "data_path": "Requests go through publik's servers to the AI provider."
+    }
+  }
+}

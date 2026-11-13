@@ -38,6 +38,27 @@ pub fn cache_key(p: &ResolvedProvider, c: &ChatCall) -> String {
     crate::net::hash::hex(&digest)
 }
 
+/// The `x-publik-idempotency-key` of a call with cache key K (docs/PUBLIK-INTEGRATION.md §5): the
+/// first 32 characters of K for a first call and for any Try again after a 402, 401, 429, 503,
+/// timeout or offline error; for the n-th Try again after an answer failed validation, the first
+/// 32 hex characters of SHA-256(`<K>:<n>`), so publik API treats it as a new request rather than
+/// a replay of the unusable answer. Always 32 lowercase hex characters.
+pub fn idempotency_key(cache_key: &str, validation_retry: u32) -> String {
+    let full = if validation_retry == 0 {
+        cache_key.to_ascii_lowercase()
+    } else {
+        let input = format!("{cache_key}:{validation_retry}");
+        crate::net::hash::hex(&Sha256::digest(input.as_bytes()))
+    };
+    // K is 64 hex characters; anything shorter is padded from its own hash so the header is
+    // always 32 lowercase hex.
+    if full.len() >= 32 && full.bytes().all(|b| b.is_ascii_hexdigit()) {
+        full[..32].to_string()
+    } else {
+        crate::net::hash::hex(&Sha256::digest(full.as_bytes()))[..32].to_string()
+    }
+}
+
 /// Where an answer for this policy goes, given the current `remember_answers_days`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Placement {
@@ -193,6 +214,31 @@ mod tests {
         assert_eq!(m.len(), 1);
         m.clear();
         assert!(m.get("k").is_none());
+    }
+
+    #[test]
+    fn idempotency_keys_match_sha256sum() {
+        // K from module 00 test 2; the retry keys are `sha256sum` of "K:1" and "K:2", cut to 32.
+        let k = "22f53c07ac6b84e42b6fea37d9f1ce05a6c42780307b5932ccf2031f7ef66dd1";
+        assert_eq!(idempotency_key(k, 0), "22f53c07ac6b84e42b6fea37d9f1ce05");
+        assert_eq!(idempotency_key(k, 1), "b6058582879f1920e30934ad9402c4db");
+        assert_eq!(idempotency_key(k, 2), "84491dd9d4f881c8ec68ba4c829a264a");
+        for n in 0..5 {
+            let key = idempotency_key(k, n);
+            assert_eq!(key.len(), 32);
+            assert!(
+                key.bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+            );
+        }
+        // Never anything but 32 lowercase hex, even for a malformed K.
+        let odd = idempotency_key("short", 0);
+        assert_eq!(odd.len(), 32);
+        assert!(odd.bytes().all(|b| b.is_ascii_hexdigit()));
+        assert_eq!(
+            idempotency_key(&k.to_ascii_uppercase(), 0),
+            idempotency_key(k, 0)
+        );
     }
 
     #[test]

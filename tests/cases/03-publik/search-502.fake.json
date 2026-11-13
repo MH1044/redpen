@@ -1,0 +1,12 @@
+{
+  "about": "POST /search, 502: the search provider failed and nothing was charged (docs/PUBLIK-CONTRACT.md §6a). Invented message.",
+  "status": 502,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "provider_error",
+      "code": "search_failed",
+      "message": "The search provider failed."
+    }
+  }
+}

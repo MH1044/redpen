@@ -1,0 +1,1 @@
+# No publik API app token yet: the maintainer adds it once with Publik's setup skill (docs/PUBLIK-INTEGRATION.md §2).

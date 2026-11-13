@@ -1,0 +1,23 @@
+{
+  "about": "POST /search, 402 for a computer not yet linked, exactly as a chat 402 (docs/PUBLIK-CONTRACT.md §6a and §8): one link, the top_up_url, though the body also carries the add-credit link. Every value is invented.",
+  "status": 402,
+  "headers": {
+    "x-publik-balance": "0",
+    "x-publik-claim-state": "anonymous"
+  },
+  "body": {
+    "error": {
+      "type": "payment_required",
+      "code": "insufficient_balance",
+      "message": "This computer has $0.00 of publik balance. Link it to a publik account for $0.05 of free use.",
+      "top_up_url": "https://publikhq.com/claim/fake-claim-token",
+      "claim_state": "anonymous"
+    },
+    "wallet": {
+      "balance_micros": 0,
+      "claim_state": "anonymous",
+      "claim_url": "https://publikhq.com/claim/fake-claim-token",
+      "add_credit_url": "https://publikhq.com/account/add-credit"
+    }
+  }
+}

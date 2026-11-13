@@ -1,0 +1,12 @@
+{
+  "about": "401 invalid_api_key: publik API disconnected this computer (docs/PUBLIK-CONTRACT.md §8). Invented message.",
+  "status": 401,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "invalid_api_key",
+      "code": "invalid_api_key",
+      "message": "The API key is not valid."
+    }
+  }
+}

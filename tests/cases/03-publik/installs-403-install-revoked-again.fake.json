@@ -1,0 +1,12 @@
+{
+  "about": "POST /installs, 403 install_revoked a second time, with its own message: the second failure surfaces this error.message (docs/PUBLIK-CONTRACT.md §11, test 2). Invented message.",
+  "status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "install_revoked",
+      "code": "install_revoked",
+      "message": "This computer cannot be set up again right now. Use your own key for now."
+    }
+  }
+}

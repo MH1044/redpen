@@ -1,0 +1,17 @@
+{
+  "about": "GET /wallet, 200, for a linked computer holding $3.12 (3120000 micro-dollars). The balance and claim state are the same in the headers and the body. Every value is invented.",
+  "status": 200,
+  "headers": {
+    "x-publik-balance": "3120000",
+    "x-publik-claim-state": "claimed",
+    "x-publik-request-id": "req_fake_wallet"
+  },
+  "body": {
+    "object": "wallet",
+    "balance_micros": 3120000,
+    "claim_state": "claimed",
+    "claim_url": "https://publikhq.com/claim/fake-claim-token",
+    "add_credit_url": "https://publikhq.com/account/add-credit",
+    "top_up_url": "https://publikhq.com/account/add-credit?app=redpen"
+  }
+}

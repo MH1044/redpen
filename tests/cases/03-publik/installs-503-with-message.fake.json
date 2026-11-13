@@ -1,0 +1,12 @@
+{
+  "about": "POST /installs, 503 with an error.message: any other code shows error.message when there is one (docs/PUBLIK-CONTRACT.md §5). Invented message.",
+  "status": 503,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "unavailable",
+      "code": "maintenance",
+      "message": "Setting up computers is paused for a few minutes."
+    }
+  }
+}

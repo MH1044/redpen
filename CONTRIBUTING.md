@@ -79,7 +79,7 @@ studied.
 - Web search: POST /search {"q","count"}; one cent a search; the user's own search key, when set, comes first
 - Redpen products: ai.chat, search
 - Redpen tiers: publik-fast for Fix grammar; publik-balanced for Clearer, Shorter, More formal, Friendlier and Custom; publik-smart for those five only when Rewrite quality is Best and the computer is linked
-- The module lives at app/src-tauri/src/publik.rs; every change to the reference is marked `// redpen:`
+- The module lives at app/src-tauri/src/publik.rs, written from docs/PUBLIK-CONTRACT.md (ADR-0010): no sign-in gate, no usage telemetry
 - No retries on Publik calls; Try again is a button. Rewrite answers and search results are cached on disk for at most 7 days
 - Plagiarism check: at most 8 searches per check, quoted phrases of at most 12 words, snippets only; result pages are never fetched
 - Chat always sends a tier. Idempotency key: first 32 hex of the cache key, or of SHA-256(<key>:<n>) after n invalid answers

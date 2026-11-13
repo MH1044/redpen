@@ -1,0 +1,27 @@
+{
+  "about": "POST /installs, 200: a replay of an install_id publik API already knows, with key null (docs/PUBLIK-CONTRACT.md §5): keep the key on disk, or mint once more under a fresh install_id when there is none. Tests set install_id to the one they sent. Every value is invented.",
+  "status": 200,
+  "headers": {},
+  "body": {
+    "key": null,
+    "key_id": "key_fake_0001",
+    "base_url": "https://publikhq.com/api/v1",
+    "install_id": "0b7e6f2c-3d4a-4e5f-8a9b-1c2d3e4f5a6b",
+    "claim_url": "https://publikhq.com/claim/fake-claim-token",
+    "claim_state": "anonymous",
+    "balance_micros": 0,
+    "add_credit_url": "https://publikhq.com/account/add-credit",
+    "cost_sentence": "A typical rewrite costs less than one cent, paid from this computer's publik balance.",
+    "wallet": {
+      "balance_micros": 0,
+      "add_credit_url": "https://publikhq.com/account/add-credit",
+      "top_up_url": "https://publikhq.com/claim/fake-claim-token",
+      "claim_state": "anonymous"
+    },
+    "disclosure": {
+      "version": 1,
+      "cost": "A typical rewrite costs less than one cent, paid from this computer's publik balance.",
+      "data_path": "Requests go through publik's servers to the AI provider."
+    }
+  }
+}

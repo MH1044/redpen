@@ -1,0 +1,13 @@
+{
+  "about": "GET /models, 200: the three tiers, for publik-proof --models. Invented body.",
+  "status": 200,
+  "headers": {},
+  "body": {
+    "object": "list",
+    "data": [
+      {"id": "publik-fast", "object": "model", "owned_by": "publik"},
+      {"id": "publik-balanced", "object": "model", "owned_by": "publik"},
+      {"id": "publik-smart", "object": "model", "owned_by": "publik"}
+    ]
+  }
+}

@@ -7,6 +7,8 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 publish = false
+# `cargo run -p redpen-app` starts the tray app; the maintainer's proof is `--bin publik-proof`.
+default-run = "redpen-app"
 
 [lib]
 name = "redpen_app"
@@ -16,8 +18,30 @@ path = "src/lib.rs"
 name = "redpen-app"
 path = "src/main.rs"
 
+# Maintainer only: one real publik API call (scripts/publik-proof.sh, docs/modules/03-publik.md).
+[[bin]]
+name = "publik-proof"
+path = "src/bin/publik-proof.rs"
+
 [build-dependencies]
 tauri-build = { workspace = true }
 
 [dependencies]
+async-trait = { workspace = true }
+redpen-core = { workspace = true }
+secrecy = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tauri = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+# A fresh version 4 install id for `POST /installs` (module 03).
+uuid = { workspace = true }
+
+# Opening a publik account link in the system browser (ShellExecuteW) on Windows.
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+tracing-subscriber = { workspace = true }

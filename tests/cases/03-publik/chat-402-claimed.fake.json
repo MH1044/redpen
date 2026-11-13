@@ -1,0 +1,23 @@
+{
+  "about": "402 for a linked computer: error.top_up_url is an add-credit link (docs/PUBLIK-CONTRACT.md §8). The body also carries the claim link and the plain add-credit link, which the app must not show. Every value is invented.",
+  "status": 402,
+  "headers": {
+    "x-publik-balance": "0",
+    "x-publik-claim-state": "claimed"
+  },
+  "body": {
+    "error": {
+      "type": "payment_required",
+      "code": "insufficient_balance",
+      "message": "Your publik balance is used up. Add a plan or pack to keep going.",
+      "top_up_url": "https://publikhq.com/account/add-credit?app=redpen",
+      "claim_state": "claimed"
+    },
+    "wallet": {
+      "balance_micros": 0,
+      "claim_state": "claimed",
+      "claim_url": "https://publikhq.com/claim/fake-claim-token",
+      "add_credit_url": "https://publikhq.com/account/add-credit"
+    }
+  }
+}

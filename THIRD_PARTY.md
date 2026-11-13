@@ -22,14 +22,15 @@ adds them.
 | thiserror | MIT OR Apache-2.0 | Error types with their messages |
 | tokio | MIT | The async runtime (the command line's `chat` too) and the production `Sleeper` |
 | tracing | MIT | Log events without content: names, durations, sizes, error kinds and HTTP status codes (module 02) |
-| windows | MIT OR Apache-2.0 | Capture on Windows (module 05), in `redpen-os` only: UI Automation for password fields, process tokens for elevation, `SendInput` for Ctrl+C, Ctrl+V and Ctrl+Z, and the clipboard; it brings Microsoft's `windows-core`, `windows-result`, `windows-strings`, `windows-link` and their companions (MIT OR Apache-2.0) |
+| windows | MIT OR Apache-2.0 | Capture on Windows (module 05), in `redpen-os`: UI Automation for password fields, process tokens for elevation, `SendInput` for Ctrl+C, Ctrl+V and Ctrl+Z, and the clipboard; in the app on Windows (module 03), `ShellExecuteW` to hand a publik account link to the system browser and `AttachConsole` so a release build's self-test line reaches the console it was started from; it brings Microsoft's `windows-core`, `windows-result`, `windows-strings`, `windows-link` and their companions (MIT OR Apache-2.0) |
+| uuid | Apache-2.0 OR MIT | A random version 4 install id for publik API's `POST /installs` (module 03), in the app only; with its `v4` feature it draws on `getrandom` (MIT OR Apache-2.0), both already in the build through Tauri |
 | ignore (tests only) | Unlicense OR MIT | The source-hygiene test's fallback walk, honouring `.gitignore` |
 | libtest-mimic (tests only) | MIT OR Apache-2.0 | One test per golden case directory |
 | proptest (tests only) | MIT OR Apache-2.0 | Generated texts with a fixed seed in the checking tests (module 01) |
 | regex (tests only) | MIT OR Apache-2.0 | The source-hygiene test's patterns |
 | tempfile (tests only) | MIT OR Apache-2.0 | Temporary directories in tests |
 | toml (tests only) | MIT OR Apache-2.0 | Reading `deny.toml` in tests |
-| tracing-subscriber (tests only) | MIT | A capturing subscriber, so tests can prove no key reaches a log line (module 02) |
+| tracing-subscriber (tests only) | MIT | A capturing subscriber, so tests can prove no key reaches a log line (module 02; the app's publik API tests from module 03) |
 
 ## npm packages (registry.npmjs.org)
 

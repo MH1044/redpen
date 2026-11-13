@@ -57,6 +57,42 @@ pub enum AiError {
         "Unrecorded request {hash} to {path}; body written to target/unrecorded/{hash}.json. Add a hand-written entry, or ask the maintainer to record it."
     )]
     Unrecorded { hash: String, path: String },
+
+    // publik API (docs/modules/03-publik.md, docs/PUBLIK-INTEGRATION.md §9). Each stops the
+    // action and offers one way out; none is ever retried automatically (invariant 9).
+    /// No provider is chosen, or publik API is chosen with no key on this computer: the
+    /// interface shows the consent view rather than a message.
+    #[error("{}", super::publik_errors::NEEDS_CONSENT)]
+    NeedsConsent,
+    /// 402: the balance does not cover the call. `message` is publik's `error.message`; the
+    /// interface adds the one link (`top_up_url`, opened through `open_account_link("top_up")`)
+    /// and "or use your own key or a local model in Settings".
+    #[error("{message}")]
+    NeedsCredit {
+        message: String,
+        top_up_url: Option<String>,
+    },
+    /// 401 (`invalid_api_key`, `key_revoked`) or 403 `install_revoked`: offer Reconnect.
+    #[error("{}", super::publik_errors::DISCONNECTED)]
+    Disconnected,
+    /// 429 from publik API: its `error.message`, no retry.
+    #[error("{message}")]
+    PublikRateLimited { message: String },
+    /// 503 from publik API: offer Try again.
+    #[error("{}", super::publik_errors::PUBLIK_BUSY)]
+    PublikBusy,
+    /// Any other 4xx or 5xx from publik API.
+    #[error("publik API {code}: {message}")]
+    PublikHttp { code: u16, message: String },
+    /// No answer from publik API within the call's timeout; publik may still settle the call.
+    #[error("publik API did not answer within {seconds} seconds. Try again.")]
+    PublikTimeout { seconds: u64 },
+    /// This build carries no `pat_` app token, so it cannot set up publik API.
+    #[error("{}", super::publik_errors::NO_APP_TOKEN)]
+    NoAppToken,
+    /// Setting up this computer (`POST /installs`) failed; `message` says why and what to do.
+    #[error("{message}")]
+    ProvisionFailed { message: String },
 }
 
 /// How the timeout message names the provider.
@@ -92,6 +128,15 @@ impl AiError {
             AiError::LocalNotLocal => "LocalNotLocal",
             AiError::InvalidAnswer => "InvalidAnswer",
             AiError::Unrecorded { .. } => "Unrecorded",
+            AiError::NeedsConsent => "NeedsConsent",
+            AiError::NeedsCredit { .. } => "NeedsCredit",
+            AiError::Disconnected => "Disconnected",
+            AiError::PublikRateLimited { .. } => "PublikRateLimited",
+            AiError::PublikBusy => "PublikBusy",
+            AiError::PublikHttp { .. } => "PublikHttp",
+            AiError::PublikTimeout { .. } => "PublikTimeout",
+            AiError::NoAppToken => "NoAppToken",
+            AiError::ProvisionFailed { .. } => "ProvisionFailed",
         }
     }
 
@@ -102,7 +147,9 @@ impl AiError {
 }
 
 /// Serialised as `{"kind", "message"}`, then the variant's fields (`code`, `model`, `who` and
-/// `seconds`, `hash` and `path`). `RateLimited`'s field is the message itself.
+/// `seconds`, `hash` and `path`, `top_up_url`). A field that is the message itself
+/// (`RateLimited`, `PublikRateLimited`, `NeedsCredit`'s and `ProvisionFailed`'s `message`, and
+/// `PublikHttp`'s) travels as `message`.
 impl Serialize for AiError {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::SerializeMap;
@@ -110,9 +157,15 @@ impl Serialize for AiError {
         map.serialize_entry("kind", self.kind())?;
         map.serialize_entry("message", &self.to_string())?;
         match self {
-            AiError::OwnKeyRefused { code } | AiError::ProviderError { code } => {
+            AiError::OwnKeyRefused { code }
+            | AiError::ProviderError { code }
+            | AiError::PublikHttp { code, .. } => {
                 map.serialize_entry("code", code)?;
             }
+            AiError::NeedsCredit { top_up_url, .. } => {
+                map.serialize_entry("top_up_url", top_up_url)?;
+            }
+            AiError::PublikTimeout { seconds } => map.serialize_entry("seconds", seconds)?,
             AiError::ModelUnknown { model } => map.serialize_entry("model", model)?,
             AiError::Timeout { who, seconds } => {
                 map.serialize_entry("who", who)?;
@@ -245,6 +298,102 @@ mod tests {
         assert_eq!(
             (unrecorded["hash"].as_str(), unrecorded["path"].as_str()),
             (Some("h"), Some("/p"))
+        );
+    }
+
+    #[test]
+    fn publik_messages_are_the_spec_strings() {
+        // docs/modules/03-publik.md, Interfaces: the Publik variants and their messages.
+        let cases = [
+            (
+                AiError::Disconnected,
+                "publik API disconnected this computer.",
+            ),
+            (
+                AiError::PublikBusy,
+                "publik API is busy; try again in a moment",
+            ),
+            (
+                AiError::PublikHttp {
+                    code: 500,
+                    message: "The model returned an error.".into(),
+                },
+                "publik API 500: The model returned an error.",
+            ),
+            (
+                AiError::PublikTimeout { seconds: 30 },
+                "publik API did not answer within 30 seconds. Try again.",
+            ),
+            (
+                AiError::NoAppToken,
+                "This build has no publik API app token. Use your own key for now.",
+            ),
+            (
+                AiError::ProvisionFailed {
+                    message: "publik API is unreachable right now. Use your own key for now."
+                        .into(),
+                },
+                "publik API is unreachable right now. Use your own key for now.",
+            ),
+            (
+                AiError::NeedsCredit {
+                    message: "Your balance is $0.00.".into(),
+                    top_up_url: Some("https://publikhq.com/claim/x".into()),
+                },
+                "Your balance is $0.00.",
+            ),
+            (
+                AiError::PublikRateLimited {
+                    message: "Too many requests from this computer.".into(),
+                },
+                "Too many requests from this computer.",
+            ),
+            (AiError::NeedsConsent, "Choose how Redpen uses AI."),
+        ];
+        for (error, message) in cases {
+            assert_eq!(error.to_string(), message, "{error:?}");
+        }
+    }
+
+    #[test]
+    fn publik_errors_serialise_with_their_fields() {
+        assert_eq!(
+            AiError::NeedsCredit {
+                message: "m".into(),
+                top_up_url: Some("https://publikhq.com/t".into())
+            }
+            .to_json(),
+            json!({"kind": "NeedsCredit", "message": "m", "top_up_url": "https://publikhq.com/t"})
+        );
+        assert_eq!(
+            AiError::PublikHttp {
+                code: 418,
+                message: "m".into()
+            }
+            .to_json(),
+            json!({"kind": "PublikHttp", "message": "publik API 418: m", "code": 418})
+        );
+        assert_eq!(
+            AiError::PublikTimeout { seconds: 30 }.to_json()["seconds"],
+            30
+        );
+        assert_eq!(AiError::NoAppToken.to_json()["kind"], "NoAppToken");
+        assert_eq!(AiError::NeedsConsent.kind(), "NeedsConsent");
+        assert_eq!(AiError::Disconnected.kind(), "Disconnected");
+        assert_eq!(AiError::PublikBusy.kind(), "PublikBusy");
+        assert_eq!(
+            AiError::PublikRateLimited {
+                message: String::new()
+            }
+            .kind(),
+            "PublikRateLimited"
+        );
+        assert_eq!(
+            AiError::ProvisionFailed {
+                message: String::new()
+            }
+            .kind(),
+            "ProvisionFailed"
         );
     }
 

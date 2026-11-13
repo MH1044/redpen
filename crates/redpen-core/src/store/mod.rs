@@ -21,8 +21,9 @@ pub use settings::{Settings, SettingsError};
 
 /// Writes `bytes` to `path` through `<path>.tmp` and a rename. With `private`, the file is
 /// readable and writable by its owner only (mode 0600) on Unix; on Windows the per-user config
-/// folder's access list already keeps other users out.
-pub(crate) fn write_atomic(path: &Path, bytes: &[u8], private: bool) -> io::Result<()> {
+/// folder's access list already keeps other users out. The app's Publik module writes the
+/// credential and `status.json` through it too.
+pub fn write_atomic(path: &Path, bytes: &[u8], private: bool) -> io::Result<()> {
     if let Some(dir) = path.parent() {
         fs::create_dir_all(dir)?;
     }

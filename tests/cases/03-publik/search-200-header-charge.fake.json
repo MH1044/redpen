@@ -1,0 +1,23 @@
+{
+  "about": "POST /search, 200 whose body has no charge_micros: the charge comes from x-publik-charge-micros instead (module 03, Scope). Invented results.",
+  "status": 200,
+  "headers": {
+    "x-publik-charge-micros": "10000"
+  },
+  "body": {
+    "object": "search.results",
+    "query": "\"largest coral reef system\"",
+    "count": 1,
+    "more": false,
+    "results": [
+      {
+        "url": "https://reefs.example.org/great-barrier-reef",
+        "title": "Great Barrier Reef",
+        "snippet": "The Great Barrier Reef is the world's largest coral reef system, off the coast of Queensland.",
+        "site": "reefs.example.org",
+        "age": "3 days ago"
+      }
+    ],
+    "request_id": "req_fake_search_2"
+  }
+}

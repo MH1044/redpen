@@ -1,0 +1,12 @@
+{
+  "about": "POST /installs, 429: publik API is busy setting up computers; the app shows error.message and offers the own key (docs/PUBLIK-CONTRACT.md §5). Invented message.",
+  "status": 429,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "rate_limited",
+      "code": "rate_limited",
+      "message": "publik API is busy setting up computers. Try again in a few minutes."
+    }
+  }
+}

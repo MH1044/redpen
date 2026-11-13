@@ -1,0 +1,8 @@
+{
+  "about": "POST /installs/revoke, 200: Disconnect, best effort (docs/PUBLIK-CONTRACT.md §5). Invented body.",
+  "status": 200,
+  "headers": {},
+  "body": {
+    "revoked": true
+  }
+}

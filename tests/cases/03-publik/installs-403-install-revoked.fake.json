@@ -1,0 +1,12 @@
+{
+  "about": "POST /installs, 403 install_revoked: mint once more under a fresh install_id (docs/PUBLIK-CONTRACT.md §5). The name is in both type and code. Invented message.",
+  "status": 403,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "install_revoked",
+      "code": "install_revoked",
+      "message": "This install was revoked."
+    }
+  }
+}

@@ -9,8 +9,10 @@
 //! the own key, a local model and the fake provider, with its cache, usage counts and errors, and
 //! [`store`] holds the settings, the keys and `redpen.db` (module 02). [`platform`] is the
 //! capture boundary, the `Capture` trait with its refusals and fake, and [`flow`] drives it: the
-//! capture of a selection, Accept and Undo (module 05). Rewriting, publik API and the plagiarism
-//! check arrive with the later modules (docs/ROADMAP.md).
+//! capture of a selection, Accept and Undo (module 05). For publik API (module 03), [`provider`]
+//! adds the tier rule, the idempotency key, the mapping of its errors, the resolver trait the app
+//! implements and the web search answer; the publik credential itself is the app's. Rewriting
+//! and the plagiarism check arrive with the later modules (docs/ROADMAP.md).
 
 pub mod check;
 pub mod clock;

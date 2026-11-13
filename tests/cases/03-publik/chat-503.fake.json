@@ -1,0 +1,12 @@
+{
+  "about": "503: the app says \"publik API is busy; try again in a moment\" with Try again, whatever error.message says (docs/PUBLIK-CONTRACT.md §8). Invented message.",
+  "status": 503,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "overloaded",
+      "code": "overloaded",
+      "message": "The service is overloaded."
+    }
+  }
+}

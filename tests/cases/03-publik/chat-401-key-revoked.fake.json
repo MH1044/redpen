@@ -1,0 +1,12 @@
+{
+  "about": "401 key_revoked: publik API disconnected this computer (docs/PUBLIK-CONTRACT.md §8). Invented message.",
+  "status": 401,
+  "headers": {},
+  "body": {
+    "error": {
+      "type": "key_revoked",
+      "code": "key_revoked",
+      "message": "This key was revoked."
+    }
+  }
+}

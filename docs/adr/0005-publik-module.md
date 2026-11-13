@@ -1,6 +1,6 @@
 # ADR-0005: Publik module: the reference module in the app crate, one AI client
 
-- **Status:** Accepted
+- **Status:** Superseded by ADR-0010
 - **Date:** 2026-10-27
 
 ## Context

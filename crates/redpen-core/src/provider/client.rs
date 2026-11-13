@@ -7,6 +7,12 @@
 //! goes through the status sink; a 2xx answer must hold a `choices[0].message.content` string,
 //! which is cached as the call's policy says and returned. Nothing that fails is cached.
 //!
+//! On publik API (module 03) every chat request also carries `x-publik-idempotency-key`
+//! ([`idempotency_key`] of K and the call's `validation_retry`), its errors map through
+//! [`map_publik_error`] with their body (a 402 keeps its one link), a timeout is
+//! `PublikTimeout`, and nothing is ever retried (invariant 9). A failed call is also reported to
+//! the status sink's `on_error`.
+//!
 //! Log events carry the provider, the feature, the attempt, the HTTP status, sizes in bytes and
 //! durations; never the text, the key, a model's answer or a URL (docs/ARCHITECTURE.md §8).
 
@@ -17,9 +23,10 @@ use secrecy::ExposeSecret;
 use serde::Serialize;
 use serde_json::{Value, json};
 
-use super::cache::{self, CachedAnswer, MemoryCache, Placement};
+use super::cache::{self, CachedAnswer, MemoryCache, Placement, idempotency_key};
 use super::errors::AiError;
 use super::local::{self, LocalModel, is_local_url, pick_local_model, tags_url};
+use super::publik_errors::map_publik_error;
 use super::resolved::{ProviderKind, ResolvedProvider};
 use super::retry::{is_retryable, retry_delays};
 use super::{ChatCall, ChatReply, Feature, StatusSink};
@@ -162,6 +169,7 @@ impl AiClient {
                 error = e.kind(),
                 "chat failed"
             );
+            self.sink.on_error(p.kind, e);
         }
         result
     }
@@ -172,7 +180,14 @@ impl AiClient {
         let privacy = self.privacy();
         let now = self.clock.now_ms();
         let placement = cache::placement(c.cache, privacy.remember_answers_days);
-        if let Some(hit) = self.cache_lookup(&key, placement, now) {
+        // A Try again after an invalid answer must reach the provider: the cached answer, if
+        // any, is the one that failed.
+        let cached = if c.validation_retry == 0 {
+            self.cache_lookup(&key, placement, now)
+        } else {
+            None
+        };
+        if let Some(hit) = cached {
             tracing::info!(
                 provider = provider.kind.as_str(),
                 feature = c.feature.as_str(),
@@ -188,10 +203,16 @@ impl AiClient {
 
         let body = chat_body(&provider, c);
         let bytes = u64::try_from(canonical_json(&body).len()).unwrap_or(u64::MAX);
-        let req = authorised(
+        let mut req = authorised(
             &provider,
             HttpRequest::post_json(provider.url(CHAT_PATH), body).timeout(c.timeout),
         );
+        if provider.kind == ProviderKind::Publik {
+            req = req.header(
+                IDEMPOTENCY_HEADER,
+                HeaderValue::plain(idempotency_key(&key, c.validation_retry)),
+            );
+        }
         let day = local_day(now, self.clock.utc_offset_minutes());
         self.count_call(&provider, c.feature, &day);
         if privacy.sent_log {
@@ -203,7 +224,7 @@ impl AiClient {
             .await;
         let resp = outcome.map_err(|e| transport_error(&provider, e, c.timeout))?;
         if !(200..=299).contains(&resp.status) {
-            return Err(status_error(&provider, resp.status, true));
+            return Err(status_error(&provider, &resp, true));
         }
         let content = answer_content(&resp).ok_or(AiError::InvalidAnswer)?;
         let answer = CachedAnswer { content };
@@ -237,7 +258,7 @@ impl AiClient {
         let (outcome, _) = self.send(p, MODELS_PATH, None, req).await;
         let resp = outcome.map_err(|e| transport_error(p, e, LISTING_TIMEOUT))?;
         if !(200..=299).contains(&resp.status) {
-            return Err(status_error(p, resp.status, false));
+            return Err(status_error(p, &resp, false));
         }
         resp.json()
             .and_then(|v| v.get("data").and_then(Value::as_array).map(Vec::len))
@@ -343,6 +364,8 @@ impl AiClient {
                 }
                 Ok(p)
             }
+            // publik API without a key: this computer is not set up, so the consent view.
+            ProviderKind::Publik if !has_key(p) => Err(AiError::NeedsConsent),
             ProviderKind::Publik | ProviderKind::Fake => Ok(p.clone()),
         }
     }
@@ -590,15 +613,22 @@ fn answer_content(resp: &HttpResponse) -> Option<String> {
         .map(str::to_string)
 }
 
-/// The error for a response that is not a 2xx. A 404 names the model only on a chat call.
-fn status_error(p: &ResolvedProvider, status: u16, chat: bool) -> AiError {
-    match status {
-        401 | 403 => AiError::OwnKeyRefused { code: status },
+/// The header that carries a publik API call's idempotency key.
+pub const IDEMPOTENCY_HEADER: &str = "x-publik-idempotency-key";
+
+/// The error for a response that is not a 2xx. publik API's errors are read from their body
+/// (contract §8); for the others, a 404 names the model only on a chat call.
+fn status_error(p: &ResolvedProvider, resp: &HttpResponse, chat: bool) -> AiError {
+    if p.kind == ProviderKind::Publik {
+        return map_publik_error(resp.status, &resp.body);
+    }
+    match resp.status {
+        401 | 403 => AiError::OwnKeyRefused { code: resp.status },
         404 if chat => AiError::ModelUnknown {
             model: p.chat_model.clone(),
         },
         429 => AiError::rate_limited(),
-        _ => AiError::ProviderError { code: status },
+        code => AiError::ProviderError { code },
     }
 }
 
@@ -606,6 +636,9 @@ fn status_error(p: &ResolvedProvider, status: u16, chat: bool) -> AiError {
 /// nothing is listening at the address.
 fn transport_error(p: &ResolvedProvider, e: TransportError, timeout: Duration) -> AiError {
     match e {
+        TransportError::Timeout if p.kind == ProviderKind::Publik => AiError::PublikTimeout {
+            seconds: timeout.as_secs(),
+        },
         TransportError::Timeout => AiError::Timeout {
             who: p.kind,
             seconds: timeout.as_secs(),
@@ -914,13 +947,182 @@ mod tests {
                 TransportError::Timeout,
             )]);
             let err = h.client.chat(&p, c).await.unwrap_err();
-            assert!(
-                matches!(err, AiError::Timeout { seconds: 30, .. }),
-                "{err:?}"
-            );
+            let expected = match kind {
+                ProviderKind::Publik => AiError::PublikTimeout { seconds: 30 },
+                _ => AiError::Timeout {
+                    who: kind,
+                    seconds: 30,
+                },
+            };
+            assert_eq!(err, expected);
             assert_eq!(h.fake.requests_seen().len(), 1);
             assert!(h.sleeper.sleeps().is_empty());
         }
+    }
+
+    fn publik(key: Option<&str>) -> ResolvedProvider {
+        ResolvedProvider {
+            kind: ProviderKind::Publik,
+            base_url: "https://publikhq.com/api/v1".into(),
+            key: key.map(Into::into),
+            chat_model: "publik-fast".into(),
+        }
+    }
+
+    fn idempotency_header(req: &HttpRequest) -> Option<String> {
+        req.headers
+            .iter()
+            .find(|(n, _)| n == IDEMPOTENCY_HEADER)
+            .map(|(_, v)| v.expose().to_string())
+    }
+
+    #[tokio::test]
+    async fn publik_calls_carry_the_idempotency_key_of_k_and_n() {
+        let p = publik(Some("pk_live_a"));
+        let c = call("hi");
+        let k = AiClient::cache_key(&p, &c);
+        let req = chat_request(&p, &c);
+        let h = harness(vec![
+            FakeEntry::reply(&req, 200, json!({"choices": []})),
+            FakeEntry::reply(&req, 200, answer("fixed")),
+        ]);
+        // A first call carries (K, 0); its unusable answer is not cached.
+        assert_eq!(
+            h.client.chat(&p, c.clone()).await.unwrap_err(),
+            AiError::InvalidAnswer
+        );
+        // The Try again after it carries (K, 1); the valid answer is stored under K.
+        let mut retry = c.clone();
+        retry.validation_retry = 1;
+        assert_eq!(h.client.chat(&p, retry).await.unwrap().content, "fixed");
+        let seen = h.fake.requests_seen();
+        assert_eq!(
+            idempotency_header(&seen[0]).unwrap(),
+            idempotency_key(&k, 0)
+        );
+        assert_eq!(
+            idempotency_header(&seen[1]).unwrap(),
+            idempotency_key(&k, 1)
+        );
+        assert!(h.db.cache_get(&k, 0).unwrap().is_some());
+        assert!(h.client.chat(&p, c).await.unwrap().from_cache);
+        // The own key carries no publik header.
+        let own = own_key();
+        let oc = call("own");
+        let h = harness(vec![FakeEntry::reply(
+            &chat_request(&own, &oc),
+            200,
+            answer("x"),
+        )]);
+        h.client.chat(&own, oc).await.unwrap();
+        assert_eq!(idempotency_header(&h.fake.requests_seen()[0]), None);
+    }
+
+    #[tokio::test]
+    async fn a_validation_retry_is_sent_even_when_k_is_cached() {
+        let p = publik(Some("pk_live_a"));
+        let c = call("hi");
+        let req = chat_request(&p, &c);
+        let h = harness(vec![
+            FakeEntry::reply(&req, 200, answer("not valid for the schema")),
+            FakeEntry::reply(&req, 200, answer("valid")),
+        ]);
+        h.client.chat(&p, c.clone()).await.unwrap();
+        let mut retry = c.clone();
+        retry.validation_retry = 1;
+        let reply = h.client.chat(&p, retry).await.unwrap();
+        assert!(!reply.from_cache);
+        assert_eq!(reply.content, "valid");
+        assert_eq!(h.fake.requests_seen().len(), 2);
+        // The valid answer replaced the cached one under K.
+        assert_eq!(h.client.chat(&p, c).await.unwrap().content, "valid");
+    }
+
+    struct ErrorSink(Mutex<Vec<AiError>>);
+    impl StatusSink for ErrorSink {
+        fn on_error(&self, _: ProviderKind, error: &AiError) {
+            self.0.lock().unwrap().push(error.clone());
+        }
+    }
+
+    #[tokio::test]
+    async fn publik_errors_are_read_from_their_body_and_reported() {
+        let p = publik(Some("pk_live_a"));
+        let cases = [
+            (
+                402,
+                json!({"error": {"message": "Link this computer for $0.05 of free use.",
+                                 "top_up_url": "https://publikhq.com/claim/x"}}),
+                AiError::NeedsCredit {
+                    message: "Link this computer for $0.05 of free use.".into(),
+                    top_up_url: Some("https://publikhq.com/claim/x".into()),
+                },
+            ),
+            (
+                401,
+                json!({"error": {"code": "key_revoked"}}),
+                AiError::Disconnected,
+            ),
+            (
+                403,
+                json!({"error": {"code": "install_revoked"}}),
+                AiError::Disconnected,
+            ),
+            (503, json!({}), AiError::PublikBusy),
+            (
+                429,
+                json!({"error": {"message": "Slow down."}}),
+                AiError::PublikRateLimited {
+                    message: "Slow down.".into(),
+                },
+            ),
+            (
+                500,
+                json!({"error": {"message": "The model returned an error."}}),
+                AiError::PublikHttp {
+                    code: 500,
+                    message: "The model returned an error.".into(),
+                },
+            ),
+        ];
+        for (status, body, expected) in cases {
+            let c = call("hi");
+            let fake = Arc::new(FakeTransport::scripted(vec![FakeEntry::reply(
+                &chat_request(&p, &c),
+                status,
+                body,
+            )]));
+            let sink = Arc::new(ErrorSink(Mutex::new(Vec::new())));
+            let db = Db::open_in_memory().unwrap();
+            let client = AiClient::new(
+                fake.clone(),
+                db.clone(),
+                Arc::new(FakeClock::at(NOW)),
+                Arc::new(FakeSleeper::new()),
+                sink.clone(),
+            );
+            assert_eq!(client.chat(&p, c).await.unwrap_err(), expected);
+            assert_eq!(fake.requests_seen().len(), 1, "{status}: one request");
+            assert_eq!(db.cache_len().unwrap(), 0, "{status}: nothing cached");
+            assert_eq!(*sink.0.lock().unwrap(), vec![expected]);
+        }
+    }
+
+    #[tokio::test]
+    async fn publik_without_a_key_needs_consent_and_sends_nothing() {
+        let h = harness(Vec::new());
+        assert_eq!(
+            h.client.chat(&publik(None), call("hi")).await.unwrap_err(),
+            AiError::NeedsConsent
+        );
+        assert_eq!(
+            h.client
+                .chat(&publik(Some("  ")), call("hi"))
+                .await
+                .unwrap_err(),
+            AiError::NeedsConsent
+        );
+        assert!(h.fake.requests_seen().is_empty());
     }
 
     #[tokio::test]

@@ -1,0 +1,33 @@
+{
+  "about": "POST /search, 200: two results and a charge of one cent, charge_micros 10000, in the body and in x-publik-charge-micros (docs/PUBLIK-CONTRACT.md §6a). The pages and sites are invented, on reserved example domains.",
+  "status": 200,
+  "headers": {
+    "x-publik-charge-micros": "10000",
+    "x-publik-balance": "3110000",
+    "x-publik-request-id": "req_fake_search_1"
+  },
+  "body": {
+    "object": "search.results",
+    "query": "\"largest coral reef system\"",
+    "count": 2,
+    "more": false,
+    "results": [
+      {
+        "url": "https://reefs.example.org/great-barrier-reef",
+        "title": "Great Barrier Reef",
+        "snippet": "The Great Barrier Reef is the world's largest coral reef system, off the coast of Queensland.",
+        "site": "reefs.example.org",
+        "age": "3 days ago"
+      },
+      {
+        "url": "https://ocean.example.net/coral/largest",
+        "title": "The largest coral reef systems",
+        "snippet": "Which is the largest coral reef system, and which come next.",
+        "site": "ocean.example.net",
+        "age": null
+      }
+    ],
+    "charge_micros": 10000,
+    "request_id": "req_fake_search_1"
+  }
+}

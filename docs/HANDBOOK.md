@@ -7,7 +7,8 @@ every example in it has been run.
 
 Building from source (see `README.md`) gives:
 
-- a tray icon with one menu item, **Quit**; no window is shown yet;
+- a tray icon with one menu item, **Quit** (and, once publik API is set up on this computer, a
+  greyed-out line above it with the balance, below); no window is shown yet;
 - the `redpen` command-line tool, which checks a text on this computer (below), sends one
   message to an AI provider when you ask it to (below), answers `redpen --version --json` with
   `{"name":"redpen","version":"0.1.0"}`, and refuses an unknown argument with
@@ -144,6 +145,80 @@ calls per day and action is kept for the usage line in Settings; and, only if yo
 Settings → Privacy → "Keep a log", a log of exactly what was sent, deleted after seven days.
 Your own key is kept in `secrets.json` in your user's settings folder, readable only by you.
 
+## publik API
+
+publik API is one of the three ways Redpen will rewrite text: it needs no key of your own and is
+paid from a publik balance, in dollars. Your own key and a local model stay just as available,
+and checking never needs any of them. The screens that set it up arrive with the popup and
+Settings; underneath them, this is how it works.
+
+**Nothing at launch.** Redpen sends nothing to publik API when it starts, unless publik API is
+your chosen AI provider and this computer is already set up; then it reads your balance once
+(`GET /wallet`), and again when Settings opens. With your own key or a local model chosen it
+never contacts publik, even if this computer was set up before. The choice is asked at the first
+AI action, never at launch, on a screen titled **Choose how Redpen uses AI**:
+
+> Checking is done on this computer and needs no AI. Only the text you select and the action you
+> choose go through publik's servers, and only when you press a rewrite button.
+>
+> Requests go through publik's servers to a shared AI model account. publik does not train on
+> them and keeps no request bodies beyond a 24-hour fingerprint that stops a request being
+> charged twice. The AI provider's own abuse monitoring applies.
+
+**Setting up this computer.** **Continue with publik API** sends one request, `POST /installs`,
+with Redpen's name and version, `windows` or `linux`, the processor type, the label `Windows PC`
+or `Linux PC` (never your computer's name), a random install id, and which disclosure you saw.
+The key it gets back is kept at `%LOCALAPPDATA%\publik\apps\redpen.json` on Windows and
+`~/.config/publik/apps/redpen.json` on Linux, readable only by you. It travels only in the
+`Authorization` header of publik API requests and is never shown, logged, written to the status
+file or handed to Redpen's window. publik API then becomes your AI provider.
+
+**Your balance.** A new computer starts at $0.00, so the action you pressed is not sent yet;
+linking the computer to a publik account (**Sign in with publik**) gives $0.05 of free use once,
+and after that a plan or a pack adds more. The balance line reads
+`$0.00 · link this computer for $0.05 of free use` until then, and afterwards, for example,
+`$3.12 of publik balance` (below one cent, four decimals: `$0.0021 of publik balance`), rounded
+down. The tray menu shows it, greyed out, above **Quit**, and updates after every publik API
+answer. What each answer cost is added to a count per day and action on this computer.
+
+**Disconnect** asks publik API to revoke this computer's key, then forgets the key even when
+publik does not answer. The install id stays, so reconnecting does not count as a new computer.
+
+**When something goes wrong.** A publik API request is never sent again by itself: publik may
+still charge a call it has started, so a failure offers **Try again** instead.
+
+| When | Message |
+|---|---|
+| the balance does not cover the request | publik's own message, with one link (**Sign in with publik** while the computer is not linked, **Add a plan or pack** after), then "or use your own key or a local model in Settings" |
+| publik API no longer accepts this computer's key | publik API disconnected this computer. (with **Reconnect**) |
+| too many requests | publik's own message |
+| publik API is busy | publik API is busy; try again in a moment |
+| any other error | publik API 500: The model returned an error. (the code and publik's message) |
+| no answer within 30 seconds | publik API did not answer within 30 seconds. Try again. |
+| no connection | No connection. Rewrites need a connection or a local model; checking still works. |
+| the build has no app token | This build has no publik API app token. Use your own key for now. |
+| setting up fails | publik's own message, or "publik API could not set up this computer (500). Use your own key for now.", or "publik API is unreachable right now. Use your own key for now." |
+
+**Builds from source.** A build can set up publik API only with the project's app token, which
+the maintainer adds once (`docs/PUBLIK-INTEGRATION.md` §2). Until then every build says "This
+build has no publik API app token. Use your own key for now." and your own key and a local model
+work as usual.
+
+**Checking a build.** With `PUBLIK_SELF_TEST` set, the app prints one line and exits before it
+opens anything. With a token it sets up this computer for real and reads the balance; without
+one, it sends nothing:
+
+```sh
+PUBLIK_SELF_TEST=1 cargo run -p redpen-app
+```
+
+```text
+publik self-test: failed: This build has no publik API app token. Use your own key for now.
+```
+
+A build with the token prints `publik self-test: ok redpen 0.1.0 (install 5f0c8a52)`, the last
+part being the start of this computer's install id. Without the variable the check never runs.
+
 ## Reading and replacing a selection on Windows
 
 The shortcut and the popup arrive with the next modules; underneath them, this is how Redpen
@@ -206,6 +281,6 @@ in Win+V like anything you copy yourself.
 
 ## Coming next
 
-In the order of `docs/ROADMAP.md`: publik API, the rewrite actions, the popup and Settings (which
-put the shortcut on top of the capture above), Linux, the personal dictionary and style presets,
-the plagiarism check, and installers.
+In the order of `docs/ROADMAP.md`: the rewrite actions, the popup and Settings (which put the
+shortcut on top of the capture above, and the publik API screens on top of the set-up above),
+Linux, the personal dictionary and style presets, the plagiarism check, and installers.

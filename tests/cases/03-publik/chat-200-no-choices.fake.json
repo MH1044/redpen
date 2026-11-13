@@ -1,0 +1,12 @@
+{
+  "about": "POST /chat/completions, 200 with no choices: the answer cannot be used (contract test 14; AiError::InvalidAnswer). Invented body.",
+  "status": 200,
+  "headers": {
+    "x-publik-charge-micros": "150"
+  },
+  "body": {
+    "id": "chatcmpl-fake",
+    "object": "chat.completion",
+    "created": 1790000000
+  }
+}

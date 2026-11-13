@@ -30,15 +30,17 @@ that ignore synthetic keyboard input.
 ## Every network call the app can make
 
 This is the complete list (`docs/ARCHITECTURE.md` §8). Nothing else contacts the network, and
-tests over the fake transport prove that a check-only session makes no request at all. At version
-0.1.0 none of these calls exists yet; each arrives with the module named.
+tests over the fake transport prove that a check-only session makes no request at all. Each call
+arrives with the module named; at version 0.1.0 the provider tests and the publik housekeeping
+exist, and nothing in the app sends a chat call or a web search yet.
 
 1. **Chat calls** to the chosen provider (module 04): `POST {publik API | your own key | local}/chat/completions`.
 2. **Publik housekeeping** (module 03): `POST /installs` after consent, `POST /installs/revoke` on
    Disconnect, `GET /wallet` at start and when Settings opens, only while publik API is the chosen
-   AI provider and a credential exists; never while your own key or a local model is chosen. With
-   `PUBLIK_SELF_TEST` set (the built-app check, never in normal use), one `POST /installs` at
-   start, then the app exits.
+   AI provider and a credential exists; never while your own key or a local model is chosen.
+   `POST /installs` carries no key; the other two carry the key in the `Authorization` header
+   only. With `PUBLIK_SELF_TEST` set (the built-app check, never in normal use), one
+   `POST /installs` and one `GET /wallet` at start, then the app exits.
 3. **Provider tests** (module 02): your own key's Test makes `GET {base_url}/models`; the local
    model's `GET http://localhost:11434/api/tags`. The local provider never contacts a host other
    than localhost (invariant 12).
@@ -56,15 +58,23 @@ What each feature sends, and what never leaves the machine, is listed feature by
 `docs/PUBLIK-INTEGRATION.md` §10, and the consent screen says it in one sentence before the first
 AI action, never at launch.
 
-The provisioning request carries a `device_name` of `Windows PC` or `Linux PC`, a generic label,
-never the hostname.
+The provisioning request (`POST /installs`) carries exactly the app token, `app_slug`
+(`redpen`), `app_version`, `os` (`windows` or `linux`), `arch`, a random `install_id`,
+`disclosure_version` and `dialects` (`["chat_completions"]`), and a `device_name` of `Windows PC`
+or `Linux PC`, a generic label, never the hostname. There is no sign-in at start and no usage
+telemetry (ADR-0010).
 
 ## Keys
 
 - The publik API key rides only in the `Authorization` header: never a query string, a command
   line, a log line or a file inside the app data directory.
-- The app token in `app/src-tauri/publik-app-token.txt` (from module 03) is public by design: it
-  can only mint keys capped to this app.
+- The app token in `app/src-tauri/publik-app-token.txt` is public by design: it can only mint
+  keys capped to this app. Until the maintainer adds it, the file holds one comment line and the
+  build cannot set up publik API.
+- The publik credential (`%LOCALAPPDATA%\publik\apps\redpen.json`, `~/.config/publik/apps/redpen.json`
+  on Linux, mode 0600) is written only by the publik module; Disconnect removes the key from it
+  and keeps the install id. `status.json` in the data directory holds the balance and usage, never
+  the key.
 - Keys never appear in error messages, the status object, events, or anything the interface
   receives. The test suite scans every one of them for a fake key, and a secret header's debug
   output is `***`.
