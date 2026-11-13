@@ -1,6 +1,12 @@
 {
   "identifier": "default",
-  "description": "The hidden main window gets the core permissions only. No filesystem, shell, dialog or HTTP permission exists: every such action goes through a command the core controls.",
-  "windows": ["main"],
-  "permissions": ["core:default"]
+  "description": "Redpen's windows (the popup, Settings and the welcome window) get the core permissions only. No filesystem, shell, dialog, HTTP or global-shortcut permission exists: every such action goes through a command the core controls.",
+  "windows": [
+    "popup",
+    "settings",
+    "welcome"
+  ],
+  "permissions": [
+    "core:default"
+  ]
 }

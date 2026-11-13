@@ -24,7 +24,7 @@ use crate::check::Dialect;
 use crate::provider::Feature;
 
 /// A rewrite action, one per popup button. Named in kebab case (`fix-grammar`, `more-formal`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Action {
     FixGrammar,

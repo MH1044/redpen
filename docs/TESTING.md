@@ -8,7 +8,7 @@
 | Module tests | `crates/redpen-core/tests/NN_slug.rs`, `crates/redpen-os/tests/NN_slug.rs`, `app/src-tauri/tests/NN_slug.rs`, `app/src/**/NN-slug.*.test.ts` | `verify` |
 | Golden cases | `tests/cases/NN-slug/<case>/`, driven by `crates/redpen-cli/tests/golden.rs` through the `redpen` binary | `verify` |
 | Hygiene | `crates/redpen-cli/tests/hygiene.rs` | `verify`, CI |
-| Windows integration | `crates/redpen-os/tests/05_capture_windows.rs` with the helper window `redpen-testwin` | CI `windows-integration` |
+| Windows integration | `crates/redpen-os/tests/05_capture_windows.rs` with the helper window `redpen-testwin`; the popup latency check of `app/src-tauri/tests/06_hotkeys.rs` (`redpen-app --measure-popup`, release build) | CI `windows-integration` |
 | Launch smoke | `redpen-app --smoke`: starts, builds the tray and hidden windows, waits for the UI's `ready` event, exits 0 within 20 s | CI, a step after `verify` on both runners from module 00 (`windows-integration` from module 05); Ubuntu under `xvfb-run` |
 | Gates | `scripts/gates.sh <gate>` / `scripts/gates.ps1 <gate>` | before a release, and by the maintainer when they spend money |
 | Manual | §8 | before a release |
@@ -157,7 +157,7 @@ fake process name.
 | Job | Runner | From module | What |
 |---|---|---|---|
 | `verify` | `windows-latest`, `ubuntu-latest` | 00 | `scripts/verify`, then the launch smoke (`redpen-app --smoke`; Ubuntu under `xvfb-run`); Ubuntu installs Tauri's Linux prerequisites |
-| `windows-integration` | `windows-latest` | 05 | capture and clipboard tests with `redpen-testwin`; launch smoke |
+| `windows-integration` | `windows-latest` | 05 | capture and clipboard tests with `redpen-testwin`; launch smoke; the popup latency check (module 06) |
 | `release` | `windows-latest`, `ubuntu-latest` | 10 | on a tag: verify, build installers, draft the release with `docs/releases/<version>.md`, publish when green |
 
 If synthetic input does not reach windows on the hosted runner, module 05 records it, keeps the

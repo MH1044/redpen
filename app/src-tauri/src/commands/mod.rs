@@ -3,6 +3,8 @@
 //! view never receives a key.
 
 pub mod publik;
+pub mod session;
+pub mod settings;
 
 use redpen_core::provider::AiError;
 use serde::Serialize;

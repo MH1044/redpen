@@ -1,5 +1,7 @@
 //! `redpen-app`: the tray app. `--smoke` starts it, waits for the hidden interface window to
-//! report ready, and exits 0 (docs/TESTING.md §1, the launch smoke).
+//! report ready, and exits 0 (docs/TESTING.md §1, the launch smoke). `--measure-popup` times the
+//! check shortcut's path from the press to the findings on Windows and prints `{"p95_ms": N}`
+//! (module 06).
 //!
 //! With `PUBLIK_SELF_TEST` set, the first lines run the publik built-app self-test instead
 //! (docs/modules/03-publik.md): one line on standard output, then the process ends before any
@@ -17,8 +19,17 @@ fn main() {
         println!("{line}");
         return;
     }
-    let smoke = std::env::args().skip(1).any(|arg| arg == "--smoke");
-    redpen_app::run(smoke);
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.iter().any(|arg| arg == "--measure-popup") {
+        attach_parent_console();
+        std::process::exit(redpen_app::measure::run());
+    }
+    let mode = if args.iter().any(|arg| arg == "--smoke") {
+        redpen_app::Mode::Smoke
+    } else {
+        redpen_app::Mode::Normal
+    };
+    redpen_app::run(mode);
 }
 
 /// A release build on Windows starts without a console, so when its output is not redirected

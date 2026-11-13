@@ -1,10 +1,13 @@
 //! The coordinating layer (docs/ARCHITECTURE.md §3), written against traits so tests run it end
 //! to end with fakes. Module 05 adds the capture half of the rewrite flow
 //! ([`rewrite::capture_session`]) and the replace path Accept uses ([`deliver()`]), with the undo
-//! buffer ([`UndoBuffer`]). Each refuses before any synthetic key (invariants 3 and 4).
+//! buffer ([`UndoBuffer`]). Each refuses before any synthetic key (invariants 3 and 4). Module 06
+//! adds [`session`]: the popup's sessions, which join the capture, Harper, the rewrite engine,
+//! Accept, Copy and Undo.
 
 pub mod deliver;
 pub mod rewrite;
+pub mod session;
 
 use std::time::Duration;
 
@@ -13,6 +16,7 @@ use crate::platform::{Capture, CaptureError};
 
 pub use deliver::{FOCUS_SETTLE, UNDO_LIFETIME, UndoBuffer, UndoOutcome, deliver};
 pub use rewrite::{Captured, capture_session};
+pub use session::{RewriteResult, Session, SessionError, Sessions, provider_line};
 
 /// How often the key wait asks whether a modifier key is still down.
 pub const KEY_POLL: Duration = Duration::from_millis(10);

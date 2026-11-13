@@ -8,7 +8,7 @@
 | 03 | publik | The Publik contract in full (`ai.chat` and `search`): provisioning, status, errors, consent strings, the search helper, tray balance | load-bearing (money path) | 02 | Done (2026-11-13) |
 | 04 | rewrite-engine | The six rewrite actions with versioned prompts, validation, redaction, language keeping, the guard, word diff | load-bearing | 01, 02, 03 | Done (2026-11-13) |
 | 05 | capture-and-replace-windows | Read and replace a selection in any Windows app, refuse secure fields, restore the clipboard | load-bearing (privacy) | 00 | Done (2026-11-13) |
-| 06 | popup-and-settings-ui | The popup, Settings, welcome, consent and first-run card; the rewrite flow end to end | interface | 03, 04, 05 | Planned |
+| 06 | popup-and-settings-ui | The popup, Settings, welcome, consent and first-run card; the rewrite flow end to end | interface | 03, 04, 05 | Done (2026-11-14) |
 | 07 | capture-linux | Capture, refusals and replacement on Linux X11, and Wayland's limits stated | load-bearing (privacy) | 05, 06 | Planned |
 | 08 | dictionary-styles-and-languages | Personal dictionary in Harper and Settings, import and export, rewrite style presets, languages | interface and core | 01, 04, 06 | Planned |
 | 09 | plagiarism-check | Up to 8 exact-phrase web searches per check, snippet matching on this computer, sources and citations | load-bearing (privacy, money path) | 03, 04, 06 | Planned |

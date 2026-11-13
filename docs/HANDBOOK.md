@@ -7,19 +7,158 @@ every example in it has been run.
 
 Building from source (see `README.md`) gives:
 
-- a tray icon with one menu item, **Quit** (and, once publik API is set up on this computer, a
-  greyed-out line above it with the balance, below); no window is shown yet;
+- a tray icon whose menu holds **Open Settings**; once publik API is set up on this computer, a
+  greyed-out line with the balance (below); **Pause Redpen**; and **Quit**;
+- on Windows, the check shortcut, Ctrl+Alt+R: select text in any app, press it, and the popup
+  opens next to the text with Harper's findings and the six rewrite actions (below). On Linux the
+  shortcut is registered but says "Redpen can't read a selection on this system yet. Checking
+  selections works on Windows." until capture arrives there;
+- a welcome window the first time Redpen starts, and a Settings window (below);
 - the `redpen` command-line tool, which checks a text on this computer (below), sends one
   message to an AI provider when you ask it to (below), rewrites a text with one of the six
   actions (below), answers `redpen --version --json` with
   `{"name":"redpen","version":"0.1.0"}`, and refuses an unknown argument with
   `error: unknown argument <arg>. Run redpen --help.`
 
+## The first start
+
+The first time Redpen starts, a small window says: "Redpen checks your writing on this computer.
+Nothing you type leaves it until you ask for a rewrite, or for a check that needs the internet.
+Password fields and apps you block are never read." It shows the check shortcut and a **Close**
+button, and it never appears again. It asks for no choice: nothing about AI is asked until you
+press a rewrite button, and Redpen sends nothing when it starts.
+
+## Checking a selection
+
+Select text in any Windows app and press **Ctrl+Alt+R**. Redpen reads the selection through the
+clipboard (and puts your clipboard back; see "Reading and replacing a selection on Windows"
+below), checks it with Harper on this computer, and opens the popup under the text cursor, or at
+the mouse when the app shows no text cursor; above it when there is no room below, and always
+inside the screen the text is on.
+
+The popup shows your text (twelve lines, then it scrolls) with each finding underlined, and the
+list of findings: the category (Spelling, Grammar, Punctuation or Style), Harper's message and
+one button per fix. A fix changes the text in the popup and checks it again; nothing is typed into
+your app yet. A text with nothing to fix says "No issues found."
+
+| Key or button | What it does |
+|---|---|
+| **Accept** (Enter) | types the text, with the fixes you applied, over your selection |
+| **Copy** (Ctrl+Shift+C) | puts it on the clipboard instead |
+| 1 to 6 | the six rewrite actions (below) |
+| **Close** (Esc) | closes the popup; the text is dropped from Redpen's memory |
+| **Undo last replace** | for two minutes after an Accept, the next popup offers to take it back |
+
+Enter on a focused button presses that button. When the popup can't read the selection it says
+why, with the messages of "Reading and replacing a selection on Windows" below, and Esc closes it.
+Press the shortcut again with the popup in front and nothing happens; press it in another app and
+the popup moves to the new selection.
+
+**Changing the shortcut.** Settings → General → **Change shortcut**, then press the new
+combination (Esc cancels). It needs Ctrl, Alt or the Windows key, with Shift if you like, and a
+letter, a digit, F1 to F24 or Space. Redpen refuses a combination another app holds ("Ctrl+Alt+K
+is already used by another app. Choose another shortcut.") and, on keyboard layouts where Ctrl+Alt
+is AltGr (Polish Ctrl+Alt+C types ć, German Ctrl+Alt+E types €), one that types a character
+("That shortcut types a character on your keyboard layout. Choose another."); the old shortcut
+keeps working. When another app already held Ctrl+Alt+R as Redpen started, Settings → General
+says so until you choose another shortcut, or set the same one again once it is free.
+
+**Pause Redpen** (in the tray menu, or Settings → General) lets go of the shortcut and greys the
+tray icon until you turn it off; Redpen remembers it across restarts.
+
+## Rewriting a selection
+
+The six buttons under the findings, or keys 1 to 6, rewrite the text (with any fixes you applied):
+**Fix grammar**, **Clearer**, **Shorter**, **More formal**, **Friendlier** and **Custom**, which
+asks for an instruction first (at most 300 characters; while you type it, digits are just
+digits). Nothing is sent until you press one, and then one request to the provider you chose
+(below). While it runs the popup says, for example, "Rewriting… (publik-balanced)", with
+**Cancel**, which stops waiting (the request is not sent again).
+
+The result shows the changes word by word, deletions struck through and insertions highlighted,
+with any warning above it (the table in "Rewriting a text" below). Under it:
+
+- the footer: on publik API the tier, what the call cost and your balance, for example
+  `publik-fast · $0.0002 · $3.12 of publik balance` (an answer Redpen remembered costs `$0.00`);
+  with your own key `Your own key · example-chat`; with a local model `Local · qwen2.5:14b`;
+- **Accept** (Enter, unless a warning says to check the result first; Ctrl+Enter always),
+  **Copy** (Ctrl+Shift+C), **Another version**, which asks for a different rewrite (not for Fix
+  grammar), and **Back** (Esc) to the findings.
+
+**When something goes wrong** the popup shows one message and at most one way out, and your
+findings stay usable under it:
+
+| After | The way out |
+|---|---|
+| an answer that could not be used, publik API busy, no answer in time, your provider's own error | **Try again** |
+| publik API disconnected this computer | **Reconnect** |
+| a balance too low (the message is publik's own) | one link, **Sign in with publik** (or **Add a plan or pack** once linked), then "or use your own key or a local model in Settings" |
+| a key refused, an unknown model, Ollama not running or without a model | **Open Settings**, at the right section |
+| Accept could not type into your app, or another app had the clipboard | **Copy** |
+| no connection, too many requests, a selection over 1,500 words | none: the message says what to do |
+
+## Choosing how Redpen uses AI
+
+Checking never needs AI. The first time you press a rewrite button, and only then, the popup
+asks **Choose how Redpen uses AI**, with the text quoted under "publik API" below, and three
+buttons: **Continue with publik API**, **Use my own key** and **Use a local model** ("You can
+change this at any time in Settings → Providers."). The action you pressed waits.
+
+- **Continue with publik API** sets up this computer (one request). A new computer starts at
+  $0.00, so the action is not sent: the popup shows the balance line, what a rewrite costs,
+  **Sign in with publik** (which opens publik in your browser), "Your checks keep working. When
+  you have linked this computer, press Try again.", **Try again**, and "Or: Use my own key · Use a
+  local model". With a balance already there, the action runs at once.
+- **Use my own key** and **Use a local model** open Settings → Providers there; when it is set up,
+  press **Try again** in the popup.
+
+**Settings → Providers** holds the same choice:
+
+- **publik API**: the balance line, "This month: $0.41 across 312 actions" (what this computer
+  spent through publik API this month), **Sign in with publik** or **Add a plan or pack**,
+  **Disconnect**, and Rewrite quality, Standard or Best (Best uses `publik-smart` once the
+  computer is linked). Choosing it on a computer that is not set up shows the same consent text,
+  then the same card without Try again: the next rewrite uses the new set-up. Opening Settings
+  reads the balance from publik API, only while it is your chosen provider; meanwhile it says
+  "Checking…", and "Can't reach publik API right now." when it can't.
+- **Your own key**: the base URL (it must start with `https://`, or be `http://localhost` for a
+  server on this computer: "Use an https:// address (or http://localhost for a server on this
+  computer)."), the key and the chat model, then **Save**; **Test** lists the provider's models
+  ("Key works: 12 models available.") and **Remove key** forgets it. The key goes to
+  `secrets.json` and never comes back to the window.
+- **Local model**: whether Ollama runs on this computer and which model Redpen will use ("Ollama
+  is running. Redpen will use qwen2.5:14b."), with **Check Ollama**; you can pick another of its
+  models instead of the automatic choice.
+
+## Privacy
+
+What leaves this computer, and when:
+
+- **Checking**: nothing, ever.
+- **A rewrite**: when you press its button, the selected text (after the markers below), the
+  action's instructions and your dialect go to the provider you chose; never the rest of the
+  document, the window's title, the app's name or your clipboard.
+- **Setting up publik API**, **Test** and **Check Ollama**: one request each, when you press them
+  (Ollama's stays on this computer).
+
+Settings → Privacy:
+
+- **Replace emails, phone numbers, IBANs and long numbers with markers before anything is sent**
+  (on by default); the answer gets them back.
+- **Apps Redpen never reads**: the password managers by default; add a program by its name (for
+  example `notes.exe`) or remove one. Redpen refuses to read or type in those apps.
+- **Remember AI answers**: 7 days or Off, and **Clear now**. A remembered answer costs nothing.
+- **Keep a log of what was sent** (off by default): each request's time, provider, action, model
+  and exactly the text sent, kept for seven days, with **Clear the log**.
+
+Settings → About shows the version and the licence (MIT OR Apache-2.0); `THIRD_PARTY.md`, in the
+source, lists every library Redpen uses and its licence.
+
 ## Checking a text on this computer
 
 Redpen checks English with Harper, a grammar checker that runs on this computer: no account, no
-key, no connection, and nothing leaves the computer. Until the popup arrives, the command-line
-tool shows what a check finds. Save a text in a UTF-8 file, then:
+key, no connection, and nothing leaves the computer. The command-line tool runs the same check on
+a file. Save a text in a UTF-8 file, then:
 
 ```sh
 redpen check note.txt
@@ -55,9 +194,8 @@ again.
 **Dialects.** `--dialect` chooses the English the text is checked against: `american` (the
 default), `british`, `australian`, `canadian` or `indian`, the five Harper offers. With
 `--dialect british`, `The colour of the sky is blue.` has no findings; with `american`, `colour`
-is a spelling finding with `color` first. The app will start from your computer's language
-setting (English for the United Kingdom, the United States, Australia, Canada or India gives that
-dialect; any other setting gives American) and let you change it in Settings.
+is a spelling finding with `color` first. In the app, Settings → General → Dialect chooses it,
+and the categories below can be switched off there.
 
 **Turning a category off.** `--disable spelling` (repeat it for more) drops that category's
 findings and keeps the others. `redpen check --disable spelling note.txt` prints
@@ -80,9 +218,9 @@ Formatting sit with Punctuation as the mechanics of the text.
 - A text over 20,000 characters is not checked: "This selection is too long to check (over
   20,000 characters). Select less text." The command-line tool prints it as
   `{"error":{"kind":"TooLong","message":"…","chars":20001}}` and exits with code 2.
-- Applying one fix at a time comes with the popup. A fix whose text has changed since the check
-  is refused with "That suggestion no longer fits the text. Check again.", and a fix that is no
-  longer offered with "That suggestion is not available any more."
+- In the popup, a fix whose text has changed since the check is refused with "That suggestion no
+  longer fits the text. Check again.", and a fix that is no longer offered with "That suggestion
+  is not available any more."
 - An empty file has no findings: `{"findings":[]}`.
 
 ## Talking to an AI provider
@@ -148,8 +286,8 @@ Your own key is kept in `secrets.json` in your user's settings folder, readable 
 
 ## Rewriting a text
 
-The popup's six rewrite buttons run on the engine below; until the popup arrives, `redpen rewrite`
-runs it on a text file. Nothing is sent until you run it, and then exactly one request.
+The popup's six rewrite buttons run on the engine below; `redpen rewrite` runs it on a text file.
+Nothing is sent until you run it, and then exactly one request.
 
 ```sh
 redpen rewrite --action fix-grammar --dialect british --redact --provider own-key note.txt
@@ -198,8 +336,8 @@ to ana@example.com when it arrive.`, Fix grammar prints one line, shown here spr
 The diff runs word by word; `redpen diff old.txt new.txt` prints the diff of two files, for `the
 cat sat` and `the dog sat` `[{"equal":"the "},{"delete":"cat"},{"insert":"dog"},{"equal":" sat"}]`.
 `charge_micros` is what publik API charged for the call in millionths of a dollar (`null` on other
-providers and from the cache). `unchanged` means the answer is your text as it was: the popup will
-say "No changes needed." The answer is cleaned before you see it: a line such as "Here is the
+providers and from the cache). `unchanged` means the answer is your text as it was: the popup
+says "No changes needed." The answer is cleaned before you see it: a line such as "Here is the
 corrected text:", quotes around the whole answer, and spaces or line breaks at its edges are
 removed, and your own leading and trailing whitespace is put back, so the result fits where the
 selection was. In the app, the same request is answered from the answer cache rather than sent
@@ -235,10 +373,10 @@ kept.
 
 ## publik API
 
-publik API is one of the three ways Redpen will rewrite text: it needs no key of your own and is
+publik API is one of the three ways Redpen rewrites text: it needs no key of your own and is
 paid from a publik balance, in dollars. Your own key and a local model stay just as available,
-and checking never needs any of them. The screens that set it up arrive with the popup and
-Settings; underneath them, this is how it works.
+and checking never needs any of them. The screens that set it up are in "Choosing how Redpen
+uses AI" above; underneath them, this is how it works.
 
 **Nothing at launch.** Redpen sends nothing to publik API when it starts, unless publik API is
 your chosen AI provider and this computer is already set up; then it reads your balance once
@@ -266,8 +404,8 @@ linking the computer to a publik account (**Sign in with publik**) gives $0.05 o
 and after that a plan or a pack adds more. The balance line reads
 `$0.00 · link this computer for $0.05 of free use` until then, and afterwards, for example,
 `$3.12 of publik balance` (below one cent, four decimals: `$0.0021 of publik balance`), rounded
-down. The tray menu shows it, greyed out, above **Quit**, and updates after every publik API
-answer. What each answer cost is added to a count per day and action on this computer.
+down. The tray menu shows it, greyed out, under **Open Settings**, and updates after every
+publik API answer. What each answer cost is added to a count per day and action on this computer.
 
 **Disconnect** asks publik API to revoke this computer's key, then forgets the key even when
 publik does not answer. The install id stays, so reconnecting does not count as a new computer.
@@ -309,8 +447,8 @@ part being the start of this computer's install id. Without the variable the che
 
 ## Reading and replacing a selection on Windows
 
-The shortcut and the popup arrive with the next modules; underneath them, this is how Redpen
-reads the text you selected in any Windows app and types a result back. It goes through the
+Underneath the shortcut and the popup, this is how Redpen reads the text you selected in any
+Windows app and types a result back. It goes through the
 clipboard, the one route every app that can copy and paste supports, and leaves your clipboard as
 it found it.
 
@@ -369,7 +507,6 @@ in Win+V like anything you copy yourself.
 
 ## Coming next
 
-In the order of `docs/ROADMAP.md`: the popup and Settings (which put the shortcut on top of the
-capture above, the rewrite buttons on top of the engine above, and the publik API screens on top
-of the set-up above), Linux, the personal dictionary and style presets, the plagiarism check, and
-installers.
+In the order of `docs/ROADMAP.md`: Linux, the personal dictionary and style presets (with
+Settings → Dictionary), the plagiarism check, and installers (with starting with the computer and
+the update check).

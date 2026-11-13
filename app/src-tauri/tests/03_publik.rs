@@ -2405,14 +2405,34 @@ fn t11_c18_the_built_app_prints_one_line_and_exits_before_any_window() {
     }
     let sb = Sandbox::new();
     let local = sb.local().to_string_lossy().into_owned();
+    let env = [
+        ("PUBLIK_SELF_TEST", "1"),
+        ("LOCALAPPDATA", local.as_str()),
+        ("XDG_CONFIG_HOME", local.as_str()),
+    ];
+    let expected = [
+        "publik self-test: failed: This build has no publik API app token. Use your own key for now.",
+    ];
+    // The first start of a freshly built binary also holds the operating system's check of a file
+    // it has never seen: on Windows with the antivirus's first-sight protection on, 2 to 9 s in
+    // testing, before any of Redpen's code runs, and the build relinks the binary whenever the
+    // front end is built. So the binary is started once untimed, held to the same output, and the
+    // 5 s apply to the start after it, which is Redpen's own.
+    let (code, out, err, _) = run_binary(
+        env!("CARGO_BIN_EXE_redpen-app"),
+        &["--smoke"],
+        &env,
+        Duration::from_secs(60),
+    );
+    assert!(
+        code.is_some(),
+        "the first start exits\nstdout:\n{out}\nstderr:\n{err}"
+    );
+    assert_eq!(out.lines().collect::<Vec<_>>(), expected, "stderr:\n{err}");
     let (code, out, err, took) = run_binary(
         env!("CARGO_BIN_EXE_redpen-app"),
         &["--smoke"],
-        &[
-            ("PUBLIK_SELF_TEST", "1"),
-            ("LOCALAPPDATA", local.as_str()),
-            ("XDG_CONFIG_HOME", local.as_str()),
-        ],
+        &env,
         Duration::from_secs(5),
     );
     assert!(
@@ -2421,13 +2441,7 @@ fn t11_c18_the_built_app_prints_one_line_and_exits_before_any_window() {
     );
     assert!(took < Duration::from_secs(5), "{took:?}");
     let lines: Vec<&str> = out.lines().collect();
-    assert_eq!(
-        lines,
-        [
-            "publik self-test: failed: This build has no publik API app token. Use your own key for now."
-        ],
-        "stderr:\n{err}"
-    );
+    assert_eq!(lines, expected, "stderr:\n{err}");
     assert!(
         !out.contains("ready") && !err.contains("ready"),
         "{out}{err}"

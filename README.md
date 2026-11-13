@@ -5,21 +5,20 @@ instant local grammar checks, AI rewrites on request, and a plagiarism check wit
 and open source. Nothing you type leaves your computer unless you ask for a rewrite, or for a
 check that needs the web.
 
-**Status: pre-alpha.** Local checking works from the command line: `redpen check` runs Harper on
-a text file, on this computer, in American, British, Australian, Canadian or Indian English, and
-`redpen fix-all` applies its fixes. `redpen chat` sends one message to your own key or to a local
-model (Ollama) through the client the rewrites will use. On Windows, the capture the shortcut will
-use is built: it reads the selection in the app in front and types a result back through the
-clipboard, refuses password fields, password managers and windows running as administrator before
-any key is sent, and puts the clipboard back as it was. The publik API set-up is built and tested
-against a fake server: consent before anything is sent, a per-computer key that never leaves the
-core, the balance in dollars in the tray menu, and one message and one way out for each error;
-live calls wait for the project's app token. The rewrite engine works from the command line:
-`redpen rewrite` runs Fix grammar, Clearer, Shorter, More formal, Friendlier or a typed
-instruction through your own key, a local model or publik API, with emails, phone numbers, IBANs
-and card numbers replaced by markers before anything is sent, every answer checked before it is
-used, and a word diff and warnings with the result. The popup is not built yet, no shortcut is
-registered, and the tray app only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order;
+**Status: pre-alpha.** On Windows, Redpen works as a tray app: select text in any app, press
+Ctrl+Alt+R, and a popup next to the text shows Harper's findings, checked on this computer, with
+one-click fixes; Fix grammar, Clearer, Shorter, More formal, Friendlier and Custom rewrite it
+through publik API, your own key or a local model (Ollama), and show a word diff to Accept, Copy,
+Undo or ask for Another version, all from the keyboard. The first AI action asks how Redpen should
+use AI; Settings holds the shortcut, the dialect, the providers and the privacy options. Emails,
+phone numbers, IBANs and card numbers are replaced by markers before anything is sent, and every
+answer is checked before it is shown. The capture reads the selection through the clipboard,
+refuses password fields, password managers and windows running as administrator before any key
+is sent, and puts the clipboard back as it was. The publik API set-up is built and tested against
+a fake server; live calls wait for the project's app token. The command-line tool runs the same
+check (`redpen check`, `redpen fix-all`) and rewrite (`redpen rewrite`) on a text file, and
+`redpen chat` sends one message to your own key or a local model. On Linux the tray app starts but
+cannot read a selection yet. `docs/ROADMAP.md` lists what comes next, in order;
 `docs/PRODUCT.md` describes the finished app; `docs/HANDBOOK.md` shows what works today.
 
 ## What it replaces
@@ -62,7 +61,8 @@ npm --prefix app run build
 cargo run -p redpen-app
 ```
 
-`cargo run -p redpen-app -- --smoke` starts it, waits for the hidden interface window to report
+It starts in the tray, registers the check shortcut, and shows the welcome window on the first
+start. `cargo run -p redpen-app -- --smoke` starts it, waits for the hidden popup window to report
 ready, and exits 0: the launch check continuous integration runs. With `PUBLIK_SELF_TEST=1` set,
 the app instead prints one `publik self-test:` line and exits before opening anything
 (`docs/HANDBOOK.md`, publik API).
@@ -103,7 +103,7 @@ parameters; `--provider own-key` reads your key, base URL and model from `REDPEN
 as `{"content": "...", "from_cache": false}`; an error as `{"error": {"kind": "...", "message":
 "..."}}` with exit code 3.
 
-To rewrite a text file, as the popup's buttons will:
+To rewrite a text file, as the popup's buttons do:
 
 ```sh
 cargo run -q -p redpen-cli -- rewrite --action fix-grammar --dialect british --redact --provider own-key note.txt
@@ -124,6 +124,15 @@ variable they skip:
 
 ```sh
 REDPEN_DESKTOP_TESTS=1 cargo test -p redpen-os --test 05_capture_windows -- --test-threads=1
+```
+
+The popup's latency check works the same way: it times 20 captures of a 300-word selection in the
+helper window, from the shortcut to Harper's findings, and passes at a 95th percentile of 300 ms
+or less. Build the helper window first, and time a release build:
+
+```sh
+cargo build -p redpen-os --bin redpen-testwin
+REDPEN_DESKTOP_TESTS=1 REDPEN_TESTWIN="$PWD/target/debug/redpen-testwin.exe" cargo test --release -p redpen-app --test 06_hotkeys t17 -- --test-threads=1
 ```
 
 The free speed gate times Harper on a 1,000-word text from a release build (`docs/TESTING.md` §4):

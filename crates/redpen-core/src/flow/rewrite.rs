@@ -1,5 +1,5 @@
-//! The rewrite flow's first step (docs/ARCHITECTURE.md §3): the hotkey's capture. The popup,
-//! the check and the rewrite actions that follow it are wired by module 06.
+//! The rewrite flow's first step (docs/ARCHITECTURE.md §3): the hotkey's capture. The check, the
+//! rewrite actions, Accept, Copy and Undo that follow it are wired in [`super::session`].
 
 use std::time::Duration;
 

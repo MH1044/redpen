@@ -12,6 +12,7 @@ rust-version = "1.98"
 
 [workspace.dependencies]
 redpen-core = { path = "crates/redpen-core" }
+redpen-os = { path = "crates/redpen-os" }
 async-trait = "0.1"
 # Pinned exactly: the module 01 goldens were recorded against Harper's own linter at this version.
 harper-core = "=3.0.0"
@@ -53,12 +54,16 @@ windows = { version = "0.62", features = [
   "Win32_Graphics_Gdi",
   "Win32_System_Ole",
   # The app hands a publik account link to the system browser with ShellExecuteW, and the
-  # release build's self-test line reaches the console it was started from (module 03).
+  # release build's self-test line reaches the console it was started from (module 03). The
+  # keyboard layout check of the check shortcut (ToUnicodeEx) uses the input feature above
+  # (module 06).
   "Win32_UI_Shell",
   "Win32_System_Console",
 ] }
 tauri = { version = "2", features = ["tray-icon"] }
 tauri-build = { version = "2", features = [] }
+# The check shortcut, registered with the operating system from Rust only (module 06).
+tauri-plugin-global-shortcut = "2.4"
 # test-only
 ignore = "0.4"
 libtest-mimic = "0.8"

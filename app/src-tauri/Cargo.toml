@@ -29,10 +29,14 @@ tauri-build = { workspace = true }
 [dependencies]
 async-trait = { workspace = true }
 redpen-core = { workspace = true }
+# Capture on Windows: reading the selection and typing the result back (module 05).
+redpen-os = { workspace = true }
 secrecy = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tauri = { workspace = true }
+# The check shortcut (module 06).
+tauri-plugin-global-shortcut = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 # A fresh version 4 install id for `POST /installs` (module 03).

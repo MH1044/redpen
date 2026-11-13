@@ -138,8 +138,8 @@ pub struct ChatReply {
     pub content: String,
     /// Whether the answer came from the cache, so nothing was sent.
     pub from_cache: bool,
-    /// What the status sink read from the response (publik API's `x-publik-charge-micros`);
-    /// `None` from the cache and off Publik.
+    /// What the call cost on publik API: the status sink's reading of the response, or else its
+    /// `x-publik-charge-micros` header; `None` from the cache and off Publik.
     pub charge_micros: Option<u64>,
     /// The response's `x-publik-request-id` (or `x-request-id`), when it has one.
     pub request_id: Option<String>,

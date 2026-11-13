@@ -10,6 +10,7 @@ adds them.
 |---|---|---|
 | tauri | Apache-2.0 OR MIT | The desktop shell: tray, windows, commands |
 | tauri-build | Apache-2.0 OR MIT | Build-time setup of the Tauri crate |
+| tauri-plugin-global-shortcut | Apache-2.0 OR MIT | The check shortcut, registered with the operating system from Rust only (module 06); it brings `tauri-plugin` (Apache-2.0 OR MIT), `global-hotkey` (Apache-2.0 OR MIT), `keyboard-types` (MIT OR Apache-2.0) and, on Linux, `x11rb` and `x11rb-protocol` (MIT OR Apache-2.0), `xkeysym` (MIT OR Apache-2.0 OR Zlib) and `gethostname` (Apache-2.0), which `x11rb` uses to find the X server's authorisation entry; Redpen never reads or sends the computer's name |
 | async-trait | MIT OR Apache-2.0 | The async `HttpTransport` and `Sleeper` traits |
 | harper-core | Apache-2.0 | Grammar, spelling and style checking on this computer, pinned at `=3.0.0` (module 01); it brings Harper's `harper-brill`, `harper-pos-utils` and `harper-thesaurus` (Apache-2.0) |
 | unicode-segmentation | MIT OR Apache-2.0 | UAX #29 words: the 1,000-word text of the `check-speed` gate; a rewrite's word count, its `max_tokens`, the minimal-edit guard and the word diff (module 04) |
@@ -26,7 +27,7 @@ adds them.
 | thiserror | MIT OR Apache-2.0 | Error types with their messages |
 | tokio | MIT | The async runtime (the command line's `chat` too) and the production `Sleeper` |
 | tracing | MIT | Log events without content: names, durations, sizes, error kinds and HTTP status codes (module 02) |
-| windows | MIT OR Apache-2.0 | Capture on Windows (module 05), in `redpen-os`: UI Automation for password fields, process tokens for elevation, `SendInput` for Ctrl+C, Ctrl+V and Ctrl+Z, and the clipboard; in the app on Windows (module 03), `ShellExecuteW` to hand a publik account link to the system browser and `AttachConsole` so a release build's self-test line reaches the console it was started from; it brings Microsoft's `windows-core`, `windows-result`, `windows-strings`, `windows-link` and their companions (MIT OR Apache-2.0) |
+| windows | MIT OR Apache-2.0 | Capture on Windows (module 05), in `redpen-os`: UI Automation for password fields, process tokens for elevation, `SendInput` for Ctrl+C, Ctrl+V and Ctrl+Z, and the clipboard; in the app on Windows (module 03), `ShellExecuteW` to hand a publik account link to the system browser and `AttachConsole` so a release build's self-test line reaches the console it was started from, and (module 06) `ToUnicodeEx`, which tells whether a new check shortcut types a character on the keyboard layout in use; it brings Microsoft's `windows-core`, `windows-result`, `windows-strings`, `windows-link` and their companions (MIT OR Apache-2.0) |
 | uuid | Apache-2.0 OR MIT | A random version 4 install id for publik API's `POST /installs` (module 03), in the app only; with its `v4` feature it draws on `getrandom` (MIT OR Apache-2.0), both already in the build through Tauri |
 | ignore (tests only) | Unlicense OR MIT | The source-hygiene test's fallback walk, honouring `.gitignore` |
 | libtest-mimic (tests only) | MIT OR Apache-2.0 | One test per golden case directory |

@@ -39,6 +39,19 @@ use crate::net::{
 use crate::store::db::{CacheRow, DAY_MS, Db, DbError, Swept, local_day};
 use crate::store::settings::PrivacySettings;
 
+/// What publik API charged for a call, from its `x-publik-charge-micros` header, when the status
+/// sink did not say: the popup's footer shows it whatever sink the client has. `None` off publik
+/// API and when the header is missing or not a whole number.
+fn publik_charge(kind: ProviderKind, resp: &HttpResponse) -> Option<u64> {
+    if kind != ProviderKind::Publik {
+        return None;
+    }
+    resp.header(crate::net::recording::CHARGE_HEADER)?
+        .trim()
+        .parse()
+        .ok()
+}
+
 /// The chat endpoint under a provider's base URL.
 pub const CHAT_PATH: &str = "/chat/completions";
 /// The model list under a provider's base URL (the own key's Test).
@@ -483,7 +496,8 @@ impl AiClient {
                     if let Some((feature, day)) = usage {
                         charge = self
                             .sink
-                            .on_response(p.kind, feature, resp.status, &resp.headers);
+                            .on_response(p.kind, feature, resp.status, &resp.headers)
+                            .or_else(|| publik_charge(p.kind, resp));
                         if let Some(micros) = charge.filter(|m| *m > 0) {
                             self.add_usage(p, feature, day, 0, micros);
                         }
@@ -1552,6 +1566,34 @@ mod tests {
                 .unwrap()
                 .unwrap();
         assert_eq!((usage.calls, usage.charge_micros), (2, 390));
+    }
+
+    #[tokio::test]
+    async fn publik_apis_charge_is_read_without_a_sink() {
+        let p = ResolvedProvider {
+            kind: ProviderKind::Publik,
+            base_url: "https://publikhq.com/api/v1".into(),
+            key: Some("pk_live_a".into()),
+            chat_model: "publik-fast".into(),
+        };
+        let own = own_key();
+        let (a, b) = (call("a"), call("b"));
+        let mut ea = FakeEntry::reply(&chat_request(&p, &a), 200, answer("x"));
+        ea.headers = vec![("x-publik-charge-micros".into(), "2100".into())];
+        let mut eb = FakeEntry::reply(&chat_request(&own, &b), 200, answer("y"));
+        eb.headers = vec![("x-publik-charge-micros".into(), "2100".into())];
+        let h = harness(vec![ea, eb]);
+        assert_eq!(
+            h.client.chat(&p, a).await.unwrap().charge_micros,
+            Some(2100)
+        );
+        // Off publik API the header means nothing.
+        assert_eq!(h.client.chat(&own, b).await.unwrap().charge_micros, None);
+        let usage =
+            h.db.usage(&local_day(NOW, 0), "publik", "fix-grammar")
+                .unwrap()
+                .unwrap();
+        assert_eq!((usage.calls, usage.charge_micros), (1, 2100));
     }
 
     #[tokio::test]
