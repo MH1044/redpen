@@ -1,0 +1,1 @@
+{"args": ["rewrite", "--action", "custom", "--dialect", "british", "--instruction", "replace Friday with Thursday", "--provider", "fake", "--recording", "recording.json", "input.txt"], "exit": 0}

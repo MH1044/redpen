@@ -14,8 +14,12 @@ clipboard, refuses password fields, password managers and windows running as adm
 any key is sent, and puts the clipboard back as it was. The publik API set-up is built and tested
 against a fake server: consent before anything is sent, a per-computer key that never leaves the
 core, the balance in dollars in the tray menu, and one message and one way out for each error;
-live calls wait for the project's app token. Nothing rewrites yet, no shortcut is registered, and
-the tray app only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order;
+live calls wait for the project's app token. The rewrite engine works from the command line:
+`redpen rewrite` runs Fix grammar, Clearer, Shorter, More formal, Friendlier or a typed
+instruction through your own key, a local model or publik API, with emails, phone numbers, IBANs
+and card numbers replaced by markers before anything is sent, every answer checked before it is
+used, and a word diff and warnings with the result. The popup is not built yet, no shortcut is
+registered, and the tray app only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order;
 `docs/PRODUCT.md` describes the finished app; `docs/HANDBOOK.md` shows what works today.
 
 ## What it replaces
@@ -99,6 +103,21 @@ parameters; `--provider own-key` reads your key, base URL and model from `REDPEN
 as `{"content": "...", "from_cache": false}`; an error as `{"error": {"kind": "...", "message":
 "..."}}` with exit code 3.
 
+To rewrite a text file, as the popup's buttons will:
+
+```sh
+cargo run -q -p redpen-cli -- rewrite --action fix-grammar --dialect british --redact --provider own-key note.txt
+cargo run -q -p redpen-cli -- prompt --action clearer note.txt
+cargo run -q -p redpen-cli -- redact note.txt
+```
+
+`--action` is `fix-grammar`, `clearer`, `shorter`, `more-formal`, `friendlier` or `custom` (with
+`--instruction "..."`, at most 300 characters); `--provider` is `local`, `own-key` or
+`publik-env` (your publik API key in `PUBLIK_API_KEY`). `rewrite` prints the result, its word diff
+and any warnings as JSON; `prompt` prints the exact request a rewrite would send, and sends nothing;
+`redact` shows what `--redact` replaces with markers. `redpen diff old.txt new.txt` prints the word
+diff of two files. `docs/HANDBOOK.md` has examples.
+
 The Windows capture tests type real keys into a helper window and replace the clipboard, so they
 run only when asked, on a computer with nothing else open (`docs/TESTING.md` §6). Without the
 variable they skip:
@@ -115,6 +134,11 @@ sh scripts/gates.sh check-speed
 
 PowerShell: `powershell -File scripts/gates.ps1 check-speed`.
 
+Maintainer only, and it spends money (about $0.44 on publik API): `sh scripts/gates.sh
+eval-rewrite` measures Fix grammar's edit ratio and guard warnings on a hundred sentences that each
+need a one-word fix, and language keeping on forty paragraphs in eight languages. It prints the number of calls and the
+tiers and asks before sending anything.
+
 ## Repository
 
 | Path | What |
@@ -123,6 +147,7 @@ PowerShell: `powershell -File scripts/gates.ps1 check-speed`.
 | `crates/redpen-os` | Reading and replacing a selection on Windows and Linux, and `redpen-testwin`, the helper window its Windows tests type into |
 | `crates/redpen-cli` | The `redpen` command-line tool the golden tests drive, and the hygiene and recordings checks |
 | `app/` | The React and TypeScript interface; `app/src-tauri/` is the Tauri shell (tray, windows, commands) and the publik API module |
+| `prompts/` | The rewrite prompts and their answer schemas, versioned files embedded at compile time; a change is a new version |
 | `scripts/` | `verify.sh` and `verify.ps1`, `gates.sh` and `gates.ps1` (quality gates), `publik-proof.sh` and `publik-proof.ps1` (one real publik API call, maintainer only), the icon generator |
 | `tests/cases/` | Golden cases run through the `redpen` binary, with their recorded answers |
 | `docs/` | Product, architecture, Publik integration and contract, testing, roadmap, one spec per module, decision records, the handbook |

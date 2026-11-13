@@ -1,0 +1,7 @@
+{
+  "error": {
+    "kind": "PlaceholderInvented",
+    "message": "The AI answer added a marker that was not in your text, so it was not used.",
+    "marker": "[EMAIL_2]"
+  }
+}

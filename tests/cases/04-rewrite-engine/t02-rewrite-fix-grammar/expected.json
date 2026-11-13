@@ -1,0 +1,37 @@
+{
+  "text": "They're going to send the report tomorrow. Please forward it to ana@example.com when it arrives.",
+  "diff": [
+    {
+      "delete": "Their"
+    },
+    {
+      "insert": "They're"
+    },
+    {
+      "equal": " going to send the report "
+    },
+    {
+      "delete": "tomorow, please"
+    },
+    {
+      "insert": "tomorrow. Please"
+    },
+    {
+      "equal": " forward it to ana@example.com when it "
+    },
+    {
+      "delete": "arrive"
+    },
+    {
+      "insert": "arrives"
+    },
+    {
+      "equal": "."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

@@ -1,0 +1,28 @@
+{
+  "text": "Dear team, could you send me the figures by Friday?",
+  "diff": [
+    {
+      "delete": "Hi"
+    },
+    {
+      "insert": "Dear"
+    },
+    {
+      "equal": " team, "
+    },
+    {
+      "delete": "can"
+    },
+    {
+      "insert": "could"
+    },
+    {
+      "equal": " you send me the figures by Friday?"
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

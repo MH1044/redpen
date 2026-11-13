@@ -1,0 +1,28 @@
+{
+  "text": "With regard to the matter of the invoice, which we discussed at some length on the phone last week, it would be appreciated if it could be settled at the earliest opportunity.",
+  "diff": [
+    {
+      "equal": "With regard to the matter of the invoice, which we discussed at some length on the phone last week, it would be appreciated if it could be "
+    },
+    {
+      "delete": "paid"
+    },
+    {
+      "insert": "settled"
+    },
+    {
+      "equal": " at the earliest opportunity"
+    },
+    {
+      "delete": " that is convenient"
+    },
+    {
+      "equal": "."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

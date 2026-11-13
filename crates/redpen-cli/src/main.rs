@@ -1,13 +1,13 @@
 //! `redpen`: the command-line tool the golden tests and the maintainer's scripts drive
 //! (docs/ARCHITECTURE.md §5). It never provisions Publik. Module 00 gives it `--version`; module
 //! 01 `check`, `fix-all` and the `check-speed` measurement; module 02 `chat` and the
-//! `--provider` choice; `rewrite`, `prompt`, `redact`, `diff` and `plagiarism` arrive with their
-//! modules.
+//! `--provider` choice; module 04 `rewrite`, `prompt`, `redact`, `diff`, the `eval-rewrite`
+//! measurement and `--provider publik-env`; `plagiarism` arrives with its module.
 
 mod cmd;
 mod providers;
 
-use std::io::Write;
+use std::io::{BufRead, Write};
 
 const NAME: &str = env!("CARGO_BIN_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -18,29 +18,50 @@ Usage: redpen --version [--json]
        redpen fix-all [--dialect D] FILE
        redpen check-speed [--dialect D] [--runs N] FILE
        redpen chat --provider P [--recording R] --message S
+       redpen rewrite --action A [--dialect D] [--style S] [--instruction I] [--redact]
+                      --provider P [--recording R] FILE
+       redpen prompt --action A [--dialect D] [--style S] [--instruction I] [--redact] FILE
+       redpen redact FILE
+       redpen diff OLD NEW
+       redpen eval-rewrite [--provider P] [--recording R] CORPUS LANGUAGES
        redpen --help
 
 D: american (the default), british, australian, canadian or indian.
 C: spelling, grammar, punctuation or style.
-P: fake, local (Ollama on this computer) or own-key (reads REDPEN_OWN_KEY,
-   REDPEN_OWN_BASE_URL and REDPEN_OWN_MODEL). R: a recording.json to answer from.
+A: fix-grammar, clearer, shorter, more-formal, friendlier or custom (needs --instruction).
+S: own (the default; style presets arrive in a later version).
+P: fake, local (Ollama on this computer), own-key (reads REDPEN_OWN_KEY,
+   REDPEN_OWN_BASE_URL and REDPEN_OWN_MODEL) or publik-env (reads PUBLIK_API_KEY and
+   PUBLIK_API_BASE_URL). R: a recording.json to answer from.
+eval-rewrite spends money on publik API: it asks before sending anything.
 ";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    let stdin = std::io::stdin();
     let stdout = std::io::stdout();
     let stderr = std::io::stderr();
-    let code = run(&args, &mut stdout.lock(), &mut stderr.lock());
+    let code = run(
+        &args,
+        &mut stdin.lock(),
+        &mut stdout.lock(),
+        &mut stderr.lock(),
+    );
     std::process::exit(code);
 }
 
 /// Runs the tool and returns its exit code (`cmd` lists them).
-fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
+fn run(args: &[String], input: &mut dyn BufRead, out: &mut dyn Write, err: &mut dyn Write) -> i32 {
     match args.first().map(String::as_str) {
         Some("check") => return cmd::check::run(&args[1..], out, err),
         Some("fix-all") => return cmd::fix_all::run(&args[1..], out, err),
         Some("check-speed") => return cmd::check_speed::run(&args[1..], out, err),
         Some("chat") => return cmd::chat::run(&args[1..], out, err),
+        Some("rewrite") => return cmd::rewrite::run(&args[1..], out, err),
+        Some("prompt") => return cmd::prompt::run(&args[1..], out, err),
+        Some("redact") => return cmd::redact::run(&args[1..], out, err),
+        Some("diff") => return cmd::diff::run(&args[1..], out, err),
+        Some("eval-rewrite") => return cmd::eval_rewrite::run(&args[1..], input, out, err),
         _ => {}
     }
     let mut version = false;
@@ -80,7 +101,7 @@ mod tests {
         let args: Vec<String> = args.iter().map(|a| a.to_string()).collect();
         let mut out = Vec::new();
         let mut err = Vec::new();
-        let code = run(&args, &mut out, &mut err);
+        let code = run(&args, &mut "".as_bytes(), &mut out, &mut err);
         (
             code,
             String::from_utf8(out).unwrap(),
@@ -119,6 +140,10 @@ mod tests {
         assert!(out.contains("redpen check [--dialect D] [--disable C]... FILE"));
         assert!(out.contains("redpen fix-all [--dialect D] FILE"));
         assert!(out.contains("redpen chat --provider P [--recording R] --message S"));
+        assert!(out.contains("redpen redact FILE"));
+        assert!(out.contains("redpen diff OLD NEW"));
+        assert!(out.contains("redpen prompt --action A"));
+        assert!(out.contains("redpen rewrite --action A"));
         let (code, out, _) = run_capturing(&[]);
         assert_eq!(code, 0);
         assert!(out.starts_with("Usage: redpen"));

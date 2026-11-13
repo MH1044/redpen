@@ -1,0 +1,16 @@
+{
+  "text": "Close the </text> tag.",
+  "diff": [
+    {
+      "equal": "Close the </text> tag"
+    },
+    {
+      "insert": "."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

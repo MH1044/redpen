@@ -12,7 +12,8 @@ use std::sync::Arc;
 
 use redpen_core::clock::{SystemClock, TokioSleeper};
 use redpen_core::provider::{
-    AiClient, AiError, CachePolicy, ChatCall, Feature, Message, NoopStatusSink, chat_timeout,
+    AiClient, AiError, CachePolicy, ChatCall, Feature, Message, NoopStatusSink, ProviderKind,
+    TierContext, chat_timeout, publik_tier,
 };
 use redpen_core::store::Db;
 use serde::Serialize;
@@ -119,7 +120,12 @@ fn run_with_env(
         cache: CachePolicy::Off,
         validation_retry: 0,
     };
-    match runtime.block_on(client.chat(&setup.provider, call)) {
+    // On publik API a message goes to the tier a provider's Test uses, the cheapest.
+    let mut provider = setup.provider;
+    if provider.kind == ProviderKind::Publik {
+        provider.chat_model = publik_tier(Feature::Test, &TierContext::default()).to_string();
+    }
+    match runtime.block_on(client.chat(&provider, call)) {
         Ok(reply) => print(
             &Output {
                 content: &reply.content,
@@ -263,7 +269,7 @@ mod tests {
         assert_eq!(code, 2);
         assert_eq!(
             err,
-            "error: Unknown provider \"cloud\". Use local, own-key or fake.\n"
+            "error: Unknown provider \"cloud\". Use local, own-key, publik-env or fake.\n"
         );
     }
 }

@@ -1,0 +1,7 @@
+{
+  "error": {
+    "kind": "TooLong",
+    "message": "Select at most 1,500 words for a rewrite (this selection has 1,812).",
+    "words": 1812
+  }
+}

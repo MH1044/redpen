@@ -1,0 +1,6 @@
+{
+  "error": {
+    "kind": "InstructionTooLong",
+    "message": "Keep the instruction under 300 characters."
+  }
+}

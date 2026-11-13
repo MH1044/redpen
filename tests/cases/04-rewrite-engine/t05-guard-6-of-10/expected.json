@@ -1,0 +1,71 @@
+{
+  "text": "They went to a shop on the bus by six.",
+  "diff": [
+    {
+      "delete": "We"
+    },
+    {
+      "insert": "They"
+    },
+    {
+      "equal": " "
+    },
+    {
+      "delete": "go"
+    },
+    {
+      "insert": "went"
+    },
+    {
+      "equal": " to "
+    },
+    {
+      "delete": "the"
+    },
+    {
+      "insert": "a"
+    },
+    {
+      "equal": " shop "
+    },
+    {
+      "delete": "in"
+    },
+    {
+      "insert": "on"
+    },
+    {
+      "equal": " the "
+    },
+    {
+      "delete": "van"
+    },
+    {
+      "insert": "bus"
+    },
+    {
+      "equal": " "
+    },
+    {
+      "delete": "at"
+    },
+    {
+      "insert": "by"
+    },
+    {
+      "equal": " six."
+    }
+  ],
+  "warnings": [
+    {
+      "kind": "guard",
+      "message": "This changes more than a grammar fix should (6 of 10 words). Check it before accepting.",
+      "changed": 6,
+      "total": 10
+    }
+  ],
+  "accept_default": false,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

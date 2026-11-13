@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "custom-result.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text", "changes_language"],
+  "properties": {
+    "text": {"type": "string", "minLength": 1, "maxLength": 40000},
+    "changes_language": {"type": "boolean"}
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "text": "He and I go there.",
+  "diff": [
+    {
+      "delete": "Me"
+    },
+    {
+      "insert": "He"
+    },
+    {
+      "equal": " and "
+    },
+    {
+      "delete": "him"
+    },
+    {
+      "insert": "I"
+    },
+    {
+      "equal": " "
+    },
+    {
+      "delete": "goes"
+    },
+    {
+      "insert": "go"
+    },
+    {
+      "equal": " there."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

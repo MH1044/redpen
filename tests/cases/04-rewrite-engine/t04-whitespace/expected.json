@@ -1,0 +1,22 @@
+{
+  "text": "  Hi there\n",
+  "diff": [
+    {
+      "equal": "  "
+    },
+    {
+      "delete": "hi"
+    },
+    {
+      "insert": "Hi"
+    },
+    {
+      "equal": " there\n"
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

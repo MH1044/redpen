@@ -1,0 +1,1 @@
+{"args": ["rewrite", "--action", "fix-grammar", "--dialect", "british", "--redact", "--provider", "fake", "--recording", "recording.json", "input.txt"], "exit": 3}

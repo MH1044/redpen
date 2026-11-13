@@ -1,0 +1,19 @@
+{
+  "text": "Thanks again for all of your help with the move last weekend.",
+  "diff": [
+    {
+      "equal": "Thanks again for all of your help with the move last weekend"
+    },
+    {
+      "delete": ", it really meant a great deal to both of us and we are very grateful"
+    },
+    {
+      "equal": "."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

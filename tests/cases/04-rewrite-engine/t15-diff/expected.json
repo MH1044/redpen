@@ -1,0 +1,14 @@
+[
+  {
+    "equal": "the "
+  },
+  {
+    "delete": "cat"
+  },
+  {
+    "insert": "dog"
+  },
+  {
+    "equal": " sat"
+  }
+]

@@ -10,7 +10,8 @@ Building from source (see `README.md`) gives:
 - a tray icon with one menu item, **Quit** (and, once publik API is set up on this computer, a
   greyed-out line above it with the balance, below); no window is shown yet;
 - the `redpen` command-line tool, which checks a text on this computer (below), sends one
-  message to an AI provider when you ask it to (below), answers `redpen --version --json` with
+  message to an AI provider when you ask it to (below), rewrites a text with one of the six
+  actions (below), answers `redpen --version --json` with
   `{"name":"redpen","version":"0.1.0"}`, and refuses an unknown argument with
   `error: unknown argument <arg>. Run redpen --help.`
 
@@ -86,9 +87,9 @@ Formatting sit with Punctuation as the mechanics of the text.
 
 ## Talking to an AI provider
 
-The rewrite actions will go through one client that speaks to any OpenAI-compatible provider. Until
-they arrive, `redpen chat` shows whether a provider answers. It sends exactly one message, only when
-you run it, and prints the answer:
+The rewrite actions (below) go through one client that speaks to any OpenAI-compatible provider.
+`redpen chat` shows whether a provider answers. It sends exactly one message, only when you run it,
+and prints the answer:
 
 ```sh
 redpen chat --provider local --message "Say hello."
@@ -144,6 +145,93 @@ still kept in memory until Redpen closes), so the same request never goes out tw
 calls per day and action is kept for the usage line in Settings; and, only if you turn on
 Settings → Privacy → "Keep a log", a log of exactly what was sent, deleted after seven days.
 Your own key is kept in `secrets.json` in your user's settings folder, readable only by you.
+
+## Rewriting a text
+
+The popup's six rewrite buttons run on the engine below; until the popup arrives, `redpen rewrite`
+runs it on a text file. Nothing is sent until you run it, and then exactly one request.
+
+```sh
+redpen rewrite --action fix-grammar --dialect british --redact --provider own-key note.txt
+```
+
+**The actions.** `fix-grammar` fixes spelling, grammar and punctuation and changes nothing else;
+`clearer`, `shorter`, `more-formal` and `friendlier` rewrite the text in that direction, keeping
+its facts, names, numbers, formatting and language; `custom` follows the instruction you type with
+`--instruction "..."` (at most 300 characters), and may change the language when you ask it to.
+`--dialect` chooses the spelling (as for checking). `--provider` is `local`, `own-key` (as for
+`redpen chat`) or `publik-env`, which uses the publik API key in `PUBLIK_API_KEY`. On publik API,
+Fix grammar goes to `publik-fast` and the other five to `publik-balanced`; with Settings →
+Providers → "Rewrite quality" set to Best on a linked computer, the app sends those five to
+`publik-smart`.
+
+**Private details.** With `--redact` (in the app, Settings → Privacy, on by default) email
+addresses, phone numbers, IBANs, card numbers and other runs of 8 or more digits are replaced by
+markers before anything is sent, and put back in the answer. `redpen redact` shows what would be
+replaced; dates and times are left alone:
+
+```sh
+redpen redact contact.txt
+```
+
+```json
+{"text":"Call [PHONE_1] or write to [EMAIL_1] before 2026-09-29 at 10.30.","entities":[{"marker":"[PHONE_1]","kind":"phone","value":"020 7946 0958"},{"marker":"[EMAIL_1]","kind":"email","value":"ana@example.com"}]}
+```
+
+An answer that drops a marker, or adds one that was not sent, is not used. `redpen prompt` takes
+the same options as `rewrite` (without `--provider`) and prints the exact request a rewrite would
+send to publik API, after redaction, without sending it.
+
+**The result.** For `note.txt` holding `Their going to send the report tomorow, please forward it
+to ana@example.com when it arrive.`, Fix grammar prints one line, shown here spread out:
+
+```json
+{"text": "They're going to send the report tomorrow. Please forward it to ana@example.com when it arrives.",
+ "diff": [{"delete": "Their"}, {"insert": "They're"}, {"equal": " going to send the report "},
+          {"delete": "tomorow, please"}, {"insert": "tomorrow. Please"},
+          {"equal": " forward it to ana@example.com when it "},
+          {"delete": "arrive"}, {"insert": "arrives"}, {"equal": "."}],
+ "warnings": [], "accept_default": true, "unchanged": false, "from_cache": false,
+ "charge_micros": null}
+```
+
+The diff runs word by word; `redpen diff old.txt new.txt` prints the diff of two files, for `the
+cat sat` and `the dog sat` `[{"equal":"the "},{"delete":"cat"},{"insert":"dog"},{"equal":" sat"}]`.
+`charge_micros` is what publik API charged for the call in millionths of a dollar (`null` on other
+providers and from the cache). `unchanged` means the answer is your text as it was: the popup will
+say "No changes needed." The answer is cleaned before you see it: a line such as "Here is the
+corrected text:", quotes around the whole answer, and spaces or line breaks at its edges are
+removed, and your own leading and trailing whitespace is put back, so the result fits where the
+selection was. In the app, the same request is answered from the answer cache rather than sent
+again; **Another version** asks for a new one.
+
+**Warnings.** A result can come with a warning, and Enter will then not accept it in the popup (the
+Accept button still does):
+
+| Warning | When |
+|---|---|
+| This changes more than a grammar fix should (6 of 10 words). Check it before accepting. | Fix grammar changed more than 35% of your words, and at least 4 |
+| The answer is in French, but your text is in English. | both texts have 40 characters or more and their languages are recognised with confidence; not for Custom when you asked for another language |
+| This is not shorter than your text. | Shorter's answer has as many words as your text, or more (Enter still accepts it) |
+
+**Refusals.** These stop a rewrite before anything is sent, or after an answer that cannot be
+used. The command line prints them as `{"error":{"kind":"...","message":"..."}}` and exits with
+code 3, as provider errors do:
+
+| Kind | Message |
+|---|---|
+| `Empty` | Select some text first. |
+| `TooLong` | Select at most 1,500 words for a rewrite (this selection has 1,812). |
+| `InstructionTooLong` | Keep the instruction under 300 characters. |
+| `InstructionMissing` | Type an instruction for Custom first. |
+| `RedactionCollision` | This text already contains a marker like [EMAIL_1], so redaction can't run safely. Turn off redaction in Settings → Privacy, or edit the text. |
+| `PlaceholderDropped` | The AI answer dropped [PHONE_1], so it was not used. Try again, or turn off redaction for this text. |
+| `PlaceholderInvented` | The AI answer added a marker that was not in your text, so it was not used. |
+| `InvalidAnswer` | The AI answer could not be used. |
+
+After an answer that could not be used, **Try again** in the popup asks publik API for a fresh
+answer rather than a repeat of the unusable one, at the usual price; an unusable answer is never
+kept.
 
 ## publik API
 
@@ -281,6 +369,7 @@ in Win+V like anything you copy yourself.
 
 ## Coming next
 
-In the order of `docs/ROADMAP.md`: the rewrite actions, the popup and Settings (which put the
-shortcut on top of the capture above, and the publik API screens on top of the set-up above),
-Linux, the personal dictionary and style presets, the plagiarism check, and installers.
+In the order of `docs/ROADMAP.md`: the popup and Settings (which put the shortcut on top of the
+capture above, the rewrite buttons on top of the engine above, and the publik API screens on top
+of the set-up above), Linux, the personal dictionary and style presets, the plagiarism check, and
+installers.

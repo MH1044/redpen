@@ -1,0 +1,1 @@
+{"args": ["prompt", "--action", "shorter", "--dialect", "british", "input.txt"], "exit": 0}

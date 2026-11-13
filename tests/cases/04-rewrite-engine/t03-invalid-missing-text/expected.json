@@ -1,0 +1,6 @@
+{
+  "error": {
+    "kind": "InvalidAnswer",
+    "message": "The AI answer could not be used."
+  }
+}

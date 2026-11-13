@@ -67,7 +67,7 @@ contains `\[(EMAIL|PHONE|IBAN|CARD|NUMBER)_\d+\]` is refused.
   (`eval-rewrite`)
 - `THIRD_PARTY.md` (`jsonschema`, `whatlang`, `regex`, `similar`)
 - Tests: `crates/redpen-core/tests/04_rewrite_engine.rs`; `tests/cases/04-rewrite-engine/`
-  (per-action cases, `languages.jsonl`, `redaction.jsonl`)
+  (per-action cases, `languages.jsonl`, `redaction.jsonl`, and `fix-grammar.jsonl` for the gate)
 
 ## Interfaces
 
@@ -111,7 +111,124 @@ warnings as in docs/PUBLIK-INTEGRATION.md §6.1 and §6.2; `unchanged` shows "No
   (ADR-0004). The guard thresholds (0.35, 4) are constants in `guard.rs`, confirmed or changed by
   the first `eval-rewrite` run, recorded here.
 - Before implementation: fetch the Publik sources and record changes (docs/PUBLIK-INTEGRATION.md §2).
-- Further decisions are filled in here during implementation.
+  Fetched raw on 2026-11-13 for module 03; for chat calls nothing changed since then (the base URL,
+  the tier names, the 402 body and the idempotency header are as the contract says). The changes
+  that were found, and ADR-0010, are in docs/modules/03-publik.md.
+- Decided before implementation:
+  - **Dependencies** (each checked against `deny.toml` and built): `jsonschema` 0.61 with default
+    features off, so no remote `$ref` resolution and no network code; `whatlang` 0.18; `similar` 3;
+    `regex` 1 (already a test dependency, now a normal one). `deny.toml` gains `MIT-0` (MIT No
+    Attribution, OSI-approved and more permissive than MIT), the licence of `borrow-or-share`, which
+    `jsonschema` needs through `referencing` and `fluent-uri`; every copyleft licence is still
+    refused.
+  - **Prompt files**: the front matter is `key: value` lines between two `---` lines, parsed by
+    hand, so no YAML library is needed; `max_tokens` holds the formula as docs/PUBLIK-INTEGRATION.md
+    §6 writes it and the action table computes it. A section's text is everything after its
+    `## system` or `## user` line up to the next `## ` line or the end, with leading and trailing
+    line breaks removed and nothing else changed. That makes the system and user contents exactly
+    the §6 example bodies.
+  - **The model in a request**: publik API and the fake provider send the tier from `publik_tier`;
+    own key and local send their configured model. `redpen prompt` prints the publik API body;
+    `redpen rewrite --provider fake` sends that same body, so a hand-written recording holds the §6
+    bodies. The CLI's `TierContext` is Standard and anonymous.
+  - **Numbers** follow module 02: `temperature` 0 is written `0`, and 0.4 is `0.4`.
+  - **Words**: `words(x)` counts the UAX #29 words that contain a letter or a digit; punctuation and
+    spaces are not words. The 1,500-word limit, `max_tokens` and the guard all use it, so the §6.1
+    example has 15 words and its answer changes 4 (ratio 0.27). Guard tokens compare exactly
+    (case-sensitive). The display diff runs over UAX #29 word and non-word runs, with neighbouring
+    operations of the same kind merged (test 15).
+  - **Language names** are whatlang's English names (`English`, `French`).
+  - **CLI output**, one JSON line each:
+    - `redpen rewrite` prints the outcome: `{"text", "diff", "warnings", "accept_default",
+      "unchanged", "from_cache", "charge_micros"}`. `diff` is a list of one-key objects, `equal`,
+      `insert` or `delete`, as test 15 shows. A warning is `{"kind": "guard" | "language" |
+      "not_shorter", "message": "…"}` plus its fields (`changed` and `total`; `expected` and
+      `got`). A refusal or AI error prints `{"error": {"kind", "message", …}}` and exits 3, as in
+      module 02; usage errors exit 2.
+    - `redpen prompt` prints the request body, exactly as sent, after redaction when `--redact` is
+      given.
+    - `redpen redact FILE` prints `{"text": "<redacted text>", "entities": [{"marker": "[EMAIL_1]",
+      "kind": "email", "value": "…"}]}`, entities in order of first appearance.
+    - `redpen diff OLD NEW` takes two files and prints the diff list.
+- Decided during implementation:
+  - **Where things live**: `redpen_core::rewrite` (the engine, `actions`, `prompts`, `parse`,
+    `clean`, `guard`), with `redact`, `lang`, `diff` and `words` beside it; `rewrite` re-exports
+    `DiffOp`, `edit_ratio`, `word_diff`, `Entity`, `redact` and `restore`, and the crate root
+    re-exports `prompts`. `build.rs` writes the list of every `prompts/**` file into `OUT_DIR`
+    with `include_str!`, so the app never reads a prompt from disk.
+  - **Prompt API**: `prompts::load(file_name, text)` parses one file and checks it (front matter
+    keys, a publik tier, the formula, `<id>.v<version>.md`, both sections, only the four known
+    placeholders, `{text}` in the user section), its error starting with the file name;
+    `prompts::get(file)` returns an embedded prompt; `prompts::render(template, values)` fills one
+    template; `prompts::render_prompt(prompt, values)` fills both sections, a value being used if
+    either section has its placeholder. Carriage returns are dropped before parsing.
+  - **Validation inside the client**: `AiClient::chat_validated(p, call, check)` runs the
+    engine's check on the answer before it is cached, so an answer that fails the schema, the
+    markers or the cleaning is never stored; a cached answer is checked too and passed over if it
+    fails. `chat` is `chat_validated` with a check that accepts everything. A failed check is not
+    reported to the status sink, since the provider did answer.
+  - **The text as sent** is the selection exactly as captured, its edges included (`t04-whitespace`
+    sends `<text>\n  hi there\n\n</text>`); the instruction is trimmed. Cleaning re-attaches the
+    original's own leading and trailing whitespace whatever the answer does with it. An answer that
+    cleaning leaves empty is `InvalidAnswer`.
+  - **The display diff's tokens** are the words and the maximal runs of text between them
+    (`words::runs`), so `, ` is one token and §6.1's `tomorow, please` → `tomorrow. Please` is one
+    deletion and one insertion. A changed stretch is shown as its deletion, then its insertion.
+  - **Redaction**: the patterns run with Unicode classes off (`\d` is `[0-9]`, `\b` an ASCII word
+    boundary), so digit counts are exact and a digit run beside an accented letter is still found.
+    A later kind never matches inside an earlier one's value; a candidate its extra rule refuses is
+    skipped and the search goes on after it. "Not an ISO date or a time" is read as: a phone-shaped
+    match is refused when only separators are left once every ISO date and every time (each
+    between word boundaries) is taken out, so `2026-09-29 10.30` stays and `01.23.45.67.89` is a
+    phone. Custom's instruction is redacted too, first, with one numbering shared with the text;
+    the answer must keep the text's markers and may hold the instruction's. With redaction off
+    there are no marker checks, so a marker the user typed is plain text.
+  - **Closing tags** are turned back in the answer only when they were escaped: `<\/text>` when
+    the text or the instruction held `</text>`, and `<\/instruction>` likewise.
+  - **The guard and the warnings**: the guard compares the selection with the cleaned, restored
+    result, in whole numbers (`changed * 100 > 35 * max(1, total)` and `changed >= 4`). Language
+    and guard warnings set `accept_default` to false; "not shorter" does not. An `unchanged`
+    outcome has no warnings. Language keeping uses `whatlang::detect` and its `is_reliable()`, on
+    texts of at least 40 characters after trimming.
+  - **Refusal order**: empty, then over 1,500 words, then Custom's instruction (missing or over
+    300 characters, counted after trimming), then the marker collision. A Custom request with no
+    instruction is `InstructionMissing`, "Type an instruction for Custom first.", a refusal the
+    Interfaces did not list.
+  - **Validation retries**: `RewriteError::is_invalid_answer` is true for `InvalidAnswer`,
+    `PlaceholderDropped` and `PlaceholderInvented`. `ValidationRetries` keeps the count per cache
+    key for as long as its owner (the popup) keeps it: its `rewrite` sets `validation_retry`,
+    adds one after an unusable answer, resets on a result and leaves the count after any other
+    error, so a Try again after a 503 sends the same key again.
+  - **The command line**: `--provider publik-env` reads `PUBLIK_API_KEY` and
+    `PUBLIK_API_BASE_URL` (publik's base URL when unset) and never provisions; `redpen chat` on it
+    sends `publik-fast`. `rewrite` reads the charge from `x-publik-charge-micros` on the fake
+    provider too, so a recording with that header shows it. `--style` accepts only `own` until
+    module 08. `diff` drops one final line ending from each file; `rewrite`, `prompt` and `redact`
+    read their file exactly.
+  - **The `eval-rewrite` gate** runs `redpen eval-rewrite` (a debug build, so the question comes at
+    once) on this module's `fix-grammar.jsonl` and `languages.jsonl`. It prints the calls, the
+    tiers and the estimated cost and asks `[y/N]` before setting up any provider, so a declined run
+    needs no key and sends nothing. Fix grammar runs once per corpus sentence, at most 100.
+    Module 01's `corpus.jsonl` has only 48 sentences, several of them style findings or with more
+    than one error, so the gate has its own corpus: `fix-grammar.jsonl`, 100 sentences written for
+    this repository (CC0, 79 American and 21 British English, no digits, so nothing is redacted),
+    each with one error that changing, or for one sentence removing, a single word fixes, and the
+    corrected sentence. Each has 8 to 14 words (median 11), so a correct fix scores at most 0.125
+    and the median of correct fixes is about 0.09, under the 0.15 limit with room for the gate to
+    see over-editing. The gate thus makes TESTING.md §4's 100 + 200 = 300 calls, about $0.44, and
+    the full check runs it scaled down: each sentence answered with its own correction changes one
+    word and never warns.
+    The language actions are Clearer, Shorter, More formal, Friendlier and Custom ("Make it sound
+    more confident."). "Guard warnings on correct fixes" is the share of Fix grammar answers with a
+    guard warning, since every corpus sentence needs a one-word fix. A provider error other than an
+    unusable answer (a 401, a 402, no connection) stops the run, so it does not go on spending:
+    nothing more is sent, standard error says `eval-rewrite: stopped after N calls: <the error>`,
+    and the report says `"pass": false`. An unusable answer is counted in `errors` and the run goes
+    on. A corpus line that is not JSON, or has no `text`, exits 2 before the question.
+  - **`whatlang` and short English**: whatlang 0.18 calls some correct English paragraphs
+    unreliable (for example "Thanks for the quick reply. Friday at ten in the morning works well
+    for me, and I will bring the report."), so no language warning is given for them; this errs
+    towards no warning.
 
 ## Acceptance tests
 
@@ -165,4 +282,4 @@ docs/PUBLIK-INTEGRATION.md §11 are tests 1 to 7 here, R10 is test 9 and R7b is 
 
 ## Status
 
-Planned
+Done (2026-11-13)

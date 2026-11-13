@@ -11,13 +11,23 @@
 //! capture boundary, the `Capture` trait with its refusals and fake, and [`flow`] drives it: the
 //! capture of a selection, Accept and Undo (module 05). For publik API (module 03), [`provider`]
 //! adds the tier rule, the idempotency key, the mapping of its errors, the resolver trait the app
-//! implements and the web search answer; the publik credential itself is the app's. Rewriting
-//! and the plagiarism check arrive with the later modules (docs/ROADMAP.md).
+//! implements and the web search answer; the publik credential itself is the app's.
+//! [`rewrite`] is the rewrite engine (module 04): the six actions' prompts, embedded at compile
+//! time from `prompts/`, answer parsing and cleaning, the minimal-edit guard, with
+//! [`redact`] (markers for private details), [`lang`] (language keeping), [`diff`] and
+//! [`words`]. The plagiarism check arrives with its module (docs/ROADMAP.md).
 
 pub mod check;
 pub mod clock;
+pub mod diff;
 pub mod flow;
+pub mod lang;
 pub mod net;
 pub mod platform;
 pub mod provider;
+pub mod redact;
+pub mod rewrite;
 pub mod store;
+pub mod words;
+
+pub use rewrite::prompts;

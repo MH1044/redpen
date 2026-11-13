@@ -1,0 +1,6 @@
+{
+  "error": {
+    "kind": "RedactionCollision",
+    "message": "This text already contains a marker like [EMAIL_1], so redaction can't run safely. Turn off redaction in Settings → Privacy, or edit the text."
+  }
+}

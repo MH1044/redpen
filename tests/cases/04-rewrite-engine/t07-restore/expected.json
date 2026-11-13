@@ -1,0 +1,22 @@
+{
+  "text": "Please call me on +44 20 7946 0958 or write to ana@example.com tomorrow.",
+  "diff": [
+    {
+      "equal": "Please call me on +44 20 7946 0958 or write to ana@example.com "
+    },
+    {
+      "delete": "tomorow"
+    },
+    {
+      "insert": "tomorrow"
+    },
+    {
+      "equal": "."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

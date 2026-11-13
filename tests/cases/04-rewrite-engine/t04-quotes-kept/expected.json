@@ -1,0 +1,22 @@
+{
+  "text": "\"Fine.\"",
+  "diff": [
+    {
+      "equal": "\""
+    },
+    {
+      "delete": "fine"
+    },
+    {
+      "insert": "Fine"
+    },
+    {
+      "equal": ".\""
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

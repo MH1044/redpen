@@ -12,7 +12,11 @@ adds them.
 | tauri-build | Apache-2.0 OR MIT | Build-time setup of the Tauri crate |
 | async-trait | MIT OR Apache-2.0 | The async `HttpTransport` and `Sleeper` traits |
 | harper-core | Apache-2.0 | Grammar, spelling and style checking on this computer, pinned at `=3.0.0` (module 01); it brings Harper's `harper-brill`, `harper-pos-utils` and `harper-thesaurus` (Apache-2.0) |
-| unicode-segmentation | MIT OR Apache-2.0 | UAX #29 words: the 1,000-word text of the `check-speed` gate (later: word counts and sentences) |
+| unicode-segmentation | MIT OR Apache-2.0 | UAX #29 words: the 1,000-word text of the `check-speed` gate; a rewrite's word count, its `max_tokens`, the minimal-edit guard and the word diff (module 04) |
+| jsonschema | MIT | Every AI answer checked against its schema before use (module 04), built with default features off so it never fetches a remote `$ref` or reads a file; it brings `referencing`, `fancy-regex`, `fraction`, `email_address` and their companions under permissive licences the licence gate checks, among them `borrow-or-share` (MIT-0, MIT without the notice condition) through `fluent-uri` |
+| regex | MIT OR Apache-2.0 | Redaction's patterns and the cleaning of AI answers (module 04); the source-hygiene test's patterns |
+| similar | Apache-2.0 | Myers' diff for the word diff and the minimal-edit guard (module 04), called without a deadline so it never reads the clock |
+| whatlang | MIT | Language keeping: whether a rewrite is in the language of its text (module 04) |
 | reqwest | MIT OR Apache-2.0 | The production HTTP transport for every provider (module 02), with its default TLS: rustls, certificates checked against the operating system's store by `rustls-platform-verifier` (MIT OR Apache-2.0), cryptography from `aws-lc-rs` (ISC AND (Apache-2.0 OR ISC)) |
 | rusqlite | MIT | `redpen.db`: the answer cache, daily usage and the sent log (module 02); with `bundled`, it compiles in SQLite itself through `libsqlite3-sys` (MIT), and SQLite's own source is in the public domain |
 | secrecy | Apache-2.0 OR MIT | Keys that never print: header values, the resolved provider, `secrets.json` |
@@ -27,7 +31,6 @@ adds them.
 | ignore (tests only) | Unlicense OR MIT | The source-hygiene test's fallback walk, honouring `.gitignore` |
 | libtest-mimic (tests only) | MIT OR Apache-2.0 | One test per golden case directory |
 | proptest (tests only) | MIT OR Apache-2.0 | Generated texts with a fixed seed in the checking tests (module 01) |
-| regex (tests only) | MIT OR Apache-2.0 | The source-hygiene test's patterns |
 | tempfile (tests only) | MIT OR Apache-2.0 | Temporary directories in tests |
 | toml (tests only) | MIT OR Apache-2.0 | Reading `deny.toml` in tests |
 | tracing-subscriber (tests only) | MIT | A capturing subscriber, so tests can prove no key reaches a log line (module 02; the app's publik API tests from module 03) |

@@ -1,0 +1,35 @@
+{
+  "text": "Write to [EMAIL_1] or [EMAIL_2], pay into [IBAN_1] with card [CARD_1], call [PHONE_1], order [NUMBER_1]. Write to [EMAIL_1] again.",
+  "entities": [
+    {
+      "marker": "[EMAIL_1]",
+      "kind": "email",
+      "value": "ana@example.com"
+    },
+    {
+      "marker": "[EMAIL_2]",
+      "kind": "email",
+      "value": "ben@example.org"
+    },
+    {
+      "marker": "[IBAN_1]",
+      "kind": "iban",
+      "value": "GB82 WEST 1234 5698 7654 32"
+    },
+    {
+      "marker": "[CARD_1]",
+      "kind": "card",
+      "value": "4111 1111 1111 1111"
+    },
+    {
+      "marker": "[PHONE_1]",
+      "kind": "phone",
+      "value": "+44 20 7946 0958"
+    },
+    {
+      "marker": "[NUMBER_1]",
+      "kind": "number",
+      "value": "123456789"
+    }
+  ]
+}

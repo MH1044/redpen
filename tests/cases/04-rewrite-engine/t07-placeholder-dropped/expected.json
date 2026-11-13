@@ -1,0 +1,7 @@
+{
+  "error": {
+    "kind": "PlaceholderDropped",
+    "message": "The AI answer dropped [PHONE_1], so it was not used. Try again, or turn off redaction for this text.",
+    "marker": "[PHONE_1]"
+  }
+}

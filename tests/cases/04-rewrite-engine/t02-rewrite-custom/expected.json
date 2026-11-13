@@ -1,0 +1,22 @@
+{
+  "text": "Thanks for the quick reply. Thursday at 10 works for me.",
+  "diff": [
+    {
+      "equal": "Thanks for the quick reply. "
+    },
+    {
+      "delete": "Friday"
+    },
+    {
+      "insert": "Thursday"
+    },
+    {
+      "equal": " at 10 works for me."
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

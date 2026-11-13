@@ -6,6 +6,8 @@
 //! the sent log when that is on, and sent, with the own key's and local retries; every response
 //! goes through the status sink; a 2xx answer must hold a `choices[0].message.content` string,
 //! which is cached as the call's policy says and returned. Nothing that fails is cached.
+//! [`AiClient::chat_validated`] adds the caller's check of that content (module 04's schema and
+//! marker checks) before it is cached, so an answer the rewrite engine cannot use never is.
 //!
 //! On publik API (module 03) every chat request also carries `x-publik-idempotency-key`
 //! ([`idempotency_key`] of K and the call's `validation_retry`), its errors map through
@@ -161,20 +163,60 @@ impl AiClient {
     /// Sends a chat call and returns `choices[0].message.content`, or the answer cached for the
     /// same key.
     pub async fn chat(&self, p: &ResolvedProvider, c: ChatCall) -> Result<ChatReply, AiError> {
-        let result = self.chat_inner(p, &c).await;
-        if let Err(e) = &result {
-            tracing::info!(
-                provider = p.kind.as_str(),
-                feature = c.feature.as_str(),
-                error = e.kind(),
-                "chat failed"
-            );
-            self.sink.on_error(p.kind, e);
-        }
-        result
+        self.chat_validated(p, c, |_| Ok::<(), AiError>(()))
+            .await
+            .map(|(reply, ())| reply)
     }
 
-    async fn chat_inner(&self, p: &ResolvedProvider, c: &ChatCall) -> Result<ChatReply, AiError> {
+    /// [`AiClient::chat`] with a check of the answer (module 04: the schema, the markers, the
+    /// cleaning). `check` runs on the content before it is cached or returned, so an answer that
+    /// fails it is never cached: the call returns the check's error, and the next Try again goes
+    /// to the provider. A cached answer is checked too; one that fails is passed over and the
+    /// call is sent. Errors of the call itself reach the status sink as with `chat`; a failed
+    /// check does not, since the provider answered.
+    pub async fn chat_validated<T, E>(
+        &self,
+        p: &ResolvedProvider,
+        c: ChatCall,
+        check: impl Fn(&str) -> Result<T, E> + Send + Sync,
+    ) -> Result<(ChatReply, T), E>
+    where
+        T: Send,
+        E: From<AiError> + Send,
+    {
+        match self.chat_inner(p, &c, &check).await {
+            Ok(done) => Ok(done),
+            Err(Failed::Call(e)) => {
+                tracing::info!(
+                    provider = p.kind.as_str(),
+                    feature = c.feature.as_str(),
+                    error = e.kind(),
+                    "chat failed"
+                );
+                self.sink.on_error(p.kind, &e);
+                Err(E::from(e))
+            }
+            Err(Failed::Check(e)) => {
+                tracing::info!(
+                    provider = p.kind.as_str(),
+                    feature = c.feature.as_str(),
+                    "chat answer failed its check"
+                );
+                Err(e)
+            }
+        }
+    }
+
+    async fn chat_inner<T, E>(
+        &self,
+        p: &ResolvedProvider,
+        c: &ChatCall,
+        check: &(impl Fn(&str) -> Result<T, E> + Send + Sync),
+    ) -> Result<(ChatReply, T), Failed<E>>
+    where
+        T: Send,
+        E: Send,
+    {
         let provider = self.prepare(p).await?;
         let key = cache::cache_key(&provider, c);
         let privacy = self.privacy();
@@ -188,17 +230,25 @@ impl AiClient {
             None
         };
         if let Some(hit) = cached {
+            if let Ok(checked) = check(&hit.content) {
+                tracing::info!(
+                    provider = provider.kind.as_str(),
+                    feature = c.feature.as_str(),
+                    "chat answered from the cache"
+                );
+                let reply = ChatReply {
+                    content: hit.content,
+                    from_cache: true,
+                    charge_micros: None,
+                    request_id: None,
+                };
+                return Ok((reply, checked));
+            }
             tracing::info!(
                 provider = provider.kind.as_str(),
                 feature = c.feature.as_str(),
-                "chat answered from the cache"
+                "a cached answer failed its check and is passed over"
             );
-            return Ok(ChatReply {
-                content: hit.content,
-                from_cache: true,
-                charge_micros: None,
-                request_id: None,
-            });
         }
 
         let body = chat_body(&provider, c);
@@ -224,12 +274,14 @@ impl AiClient {
             .await;
         let resp = outcome.map_err(|e| transport_error(&provider, e, c.timeout))?;
         if !(200..=299).contains(&resp.status) {
-            return Err(status_error(&provider, &resp, true));
+            return Err(status_error(&provider, &resp, true).into());
         }
         let content = answer_content(&resp).ok_or(AiError::InvalidAnswer)?;
+        // Checked before it is stored: an answer that fails is never cached (invariant 8).
+        let checked = check(&content).map_err(Failed::Check)?;
         let answer = CachedAnswer { content };
         self.cache_store(key, &provider, c, &answer, charge, placement);
-        Ok(ChatReply {
+        let reply = ChatReply {
             content: answer.content,
             from_cache: false,
             charge_micros: charge,
@@ -237,7 +289,8 @@ impl AiClient {
                 .header("x-publik-request-id")
                 .or_else(|| resp.header("x-request-id"))
                 .map(str::to_string),
-        })
+        };
+        Ok((reply, checked))
     }
 
     /// `GET {base_url}/models` with the key: how many models the provider lists.
@@ -546,6 +599,18 @@ impl AiClient {
                 }
             }
         }
+    }
+}
+
+/// Why a checked chat call gave no answer: the call failed, or its answer failed the check.
+enum Failed<E> {
+    Call(AiError),
+    Check(E),
+}
+
+impl<E> From<AiError> for Failed<E> {
+    fn from(e: AiError) -> Self {
+        Failed::Call(e)
     }
 }
 
@@ -1036,6 +1101,90 @@ mod tests {
         assert_eq!(h.fake.requests_seen().len(), 2);
         // The valid answer replaced the cached one under K.
         assert_eq!(h.client.chat(&p, c).await.unwrap().content, "valid");
+    }
+
+    #[derive(Debug, PartialEq)]
+    enum CheckError {
+        Ai(AiError),
+        Rejected(String),
+    }
+
+    impl From<AiError> for CheckError {
+        fn from(e: AiError) -> Self {
+            CheckError::Ai(e)
+        }
+    }
+
+    fn only_ok(content: &str) -> Result<usize, CheckError> {
+        if content == "ok" {
+            Ok(content.len())
+        } else {
+            Err(CheckError::Rejected(content.to_string()))
+        }
+    }
+
+    #[tokio::test]
+    async fn an_answer_that_fails_its_check_is_not_cached() {
+        let p = own_key();
+        let c = call("hi");
+        let req = chat_request(&p, &c);
+        let h = harness(vec![
+            FakeEntry::reply(&req, 200, answer("bad")),
+            FakeEntry::reply(&req, 200, answer("ok")),
+        ]);
+        assert_eq!(
+            h.client
+                .chat_validated(&p, c.clone(), only_ok)
+                .await
+                .unwrap_err(),
+            CheckError::Rejected("bad".into())
+        );
+        assert_eq!(h.db.cache_len().unwrap(), 0);
+        // The next call is sent, and its valid answer is cached and checked again from there.
+        let (reply, n) = h
+            .client
+            .chat_validated(&p, c.clone(), only_ok)
+            .await
+            .unwrap();
+        assert_eq!(
+            (reply.content.as_str(), reply.from_cache, n),
+            ("ok", false, 2)
+        );
+        assert_eq!(h.db.cache_len().unwrap(), 1);
+        let (reply, _) = h.client.chat_validated(&p, c, only_ok).await.unwrap();
+        assert!(reply.from_cache);
+        assert_eq!(h.fake.requests_seen().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn a_cached_answer_that_fails_its_check_is_passed_over() {
+        let p = own_key();
+        let c = call("hi");
+        let req = chat_request(&p, &c);
+        let h = harness(vec![
+            FakeEntry::reply(&req, 200, answer("old")),
+            FakeEntry::reply(&req, 200, answer("ok")),
+        ]);
+        // `chat` checks nothing, so "old" is cached.
+        assert_eq!(h.client.chat(&p, c.clone()).await.unwrap().content, "old");
+        let (reply, _) = h.client.chat_validated(&p, c, only_ok).await.unwrap();
+        assert_eq!((reply.content.as_str(), reply.from_cache), ("ok", false));
+        assert_eq!(h.fake.requests_seen().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn call_errors_still_come_through_a_check() {
+        let p = own_key();
+        let c = call("hi");
+        let h = harness(vec![FakeEntry::reply(
+            &chat_request(&p, &c),
+            401,
+            json!({}),
+        )]);
+        assert_eq!(
+            h.client.chat_validated(&p, c, only_ok).await.unwrap_err(),
+            CheckError::Ai(AiError::OwnKeyRefused { code: 401 })
+        );
     }
 
     struct ErrorSink(Mutex<Vec<AiError>>);

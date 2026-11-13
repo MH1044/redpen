@@ -1,14 +1,21 @@
 //! The subcommands of `redpen` (docs/ARCHITECTURE.md §5), one file each, and what they share:
 //! option parsing, reading the input file, and the exit codes.
 //!
-//! Exit codes: 0 success; 1 a gate that measured a failure (`check-speed`); 2 a usage error, a
-//! file that cannot be read as UTF-8 text, or a text the core refused (`TooLong`); 3 a provider
-//! call that failed (`chat`: an `AiError`, an unrecorded request included).
+//! Exit codes: 0 success; 1 a gate that measured a failure (`check-speed`, `eval-rewrite`); 2 a
+//! usage error, a file that cannot be read as UTF-8 text, or a text the checker refused
+//! (`TooLong`); 3 a provider call that failed (`chat`: an `AiError`, an unrecorded request
+//! included) or a rewrite that gave no result (`rewrite`, `prompt`, `redact`: a `RewriteError`,
+//! refusals before any request included).
 
 pub mod chat;
 pub mod check;
 pub mod check_speed;
+pub mod diff;
+pub mod eval_rewrite;
 pub mod fix_all;
+pub mod prompt;
+pub mod redact;
+pub mod rewrite;
 
 use std::io::Write;
 
@@ -125,6 +132,21 @@ pub fn parse(name: &str, args: &[String], accepts: Accepts) -> Result<Opts, Fail
         )));
     }
     Ok(opts)
+}
+
+/// The file arguments of a command that takes at most `max` files and no options: an option is
+/// an unknown argument, and so is a file past the `max`-th.
+pub fn files(args: &[String], max: usize) -> Result<Vec<&str>, Failure> {
+    let mut files = Vec::new();
+    for arg in args {
+        if (arg.starts_with('-') && arg != "-") || files.len() == max {
+            return Err(Failure::usage(format!(
+                "unknown argument {arg}. Run redpen --help."
+            )));
+        }
+        files.push(arg.as_str());
+    }
+    Ok(files)
 }
 
 /// The whole of `path` as UTF-8 text, exactly as stored: no line ending or byte-order mark is

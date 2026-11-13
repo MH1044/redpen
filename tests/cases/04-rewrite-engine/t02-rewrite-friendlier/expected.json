@@ -1,0 +1,34 @@
+{
+  "text": "Could you send the signed form back to us by Monday?",
+  "diff": [
+    {
+      "delete": "You"
+    },
+    {
+      "insert": "Could"
+    },
+    {
+      "equal": " "
+    },
+    {
+      "delete": "must"
+    },
+    {
+      "insert": "you"
+    },
+    {
+      "equal": " send the signed form back to us by Monday"
+    },
+    {
+      "delete": "."
+    },
+    {
+      "insert": "?"
+    }
+  ],
+  "warnings": [],
+  "accept_default": true,
+  "unchanged": false,
+  "from_cache": false,
+  "charge_micros": null
+}

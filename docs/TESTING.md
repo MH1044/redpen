@@ -75,7 +75,9 @@ live with that module's cases: `tests/cases/01-harper-check/corpus.jsonl`
 (sentences with one known error each, the expected category and correction) and `unicode.txt`
 (emoji with ZWJ, combining marks, CJK, astral characters);
 `tests/cases/04-rewrite-engine/languages.jsonl` (5 paragraphs each in English, French, German,
-Spanish, Portuguese, Italian, Dutch and Polish) and `redaction.jsonl` (`@example.com` addresses,
+Spanish, Portuguese, Italian, Dutch and Polish), `fix-grammar.jsonl` (100 sentences for the
+`eval-rewrite` gate, each with one error that a one-word change fixes, and the corrected sentence)
+and `redaction.jsonl` (`@example.com` addresses,
 fictional numbers from the UK and US reserved ranges, the standard example IBAN
 `GB82 WEST 1234 5698 7654 32`, the public test card `4111 1111 1111 1111`).
 

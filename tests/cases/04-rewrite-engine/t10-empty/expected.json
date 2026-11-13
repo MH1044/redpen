@@ -1,0 +1,6 @@
+{
+  "error": {
+    "kind": "Empty",
+    "message": "Select some text first."
+  }
+}
