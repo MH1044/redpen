@@ -2414,9 +2414,27 @@ fn e_eval_rewrite_announces_the_calls_of_testing_section_4() {
     }
 }
 
+/// The gate scripts start the CLI with `cargo run -p redpen-cli`, which builds it with the CLI's
+/// own set of dependency features, not the workspace's. On a machine that has never built it that
+/// way the build takes minutes, so it happens here, once and untimed: what `GATE_TIMEOUT` times
+/// is the gate's answer to `n`.
+fn build_the_cli_once() {
+    static BUILT: std::sync::OnceLock<()> = std::sync::OnceLock::new();
+    BUILT.get_or_init(|| {
+        let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+        let status = Command::new(cargo)
+            .args(["build", "-q", "-p", "redpen-cli"])
+            .current_dir(repo_root())
+            .status()
+            .expect("cargo could not be started to build redpen-cli");
+        assert!(status.success(), "cargo build -p redpen-cli failed");
+    });
+}
+
 /// `eval-rewrite` run with each installed shell, answering `n`, with both providers pointing at
 /// `port`: `(script, exit code, what it printed)`.
 fn gate_runs(port: u16) -> Vec<(String, Option<i32>, String)> {
+    build_the_cli_once();
     let (powershell, flags): (&str, &[&str]) = if cfg!(windows) {
         (
             "powershell",
