@@ -9,3 +9,19 @@ rust-version.workspace = true
 publish = false
 
 [dependencies]
+redpen-core = { workspace = true }
+tracing = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# The helper window the Windows capture tests type into (docs/TESTING.md §1). On Linux it only
+# says that it runs on Windows.
+[[bin]]
+name = "redpen-testwin"
+path = "src/bin/redpen-testwin.rs"
+test = false

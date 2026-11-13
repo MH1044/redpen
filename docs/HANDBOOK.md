@@ -144,8 +144,68 @@ calls per day and action is kept for the usage line in Settings; and, only if yo
 Settings → Privacy → "Keep a log", a log of exactly what was sent, deleted after seven days.
 Your own key is kept in `secrets.json` in your user's settings folder, readable only by you.
 
+## Reading and replacing a selection on Windows
+
+The shortcut and the popup arrive with the next modules; underneath them, this is how Redpen
+reads the text you selected in any Windows app and types a result back. It goes through the
+clipboard, the one route every app that can copy and paste supports, and leaves your clipboard as
+it found it.
+
+**Before any key is sent**, Redpen looks at the window in front and stops, in this order, when:
+
+1. the app is on the blocklist (Settings → Privacy). By default it holds the password managers
+   1Password, Bitwarden, KeePass, KeePassXC, Dashlane, Enpass, NordPass and Proton Pass:
+   "Redpen is turned off for this app (Settings → Privacy).";
+2. the window runs as administrator, which Windows does not let a normal app read or type into:
+   "This window runs as administrator, so Windows doesn't let Redpen read or type into it.";
+3. the field you are in is a password field: "Redpen doesn't read or type into password fields."
+
+Then it waits for you to let go of Ctrl, Alt, Shift and the Windows key, for up to a second
+("Release the shortcut keys, then try again."), sends Ctrl+C, and gives the app 400 ms to copy
+(`capture.copy_timeout_ms` in `settings.json`). When nothing arrives: "Nothing was copied. Select
+some text first."
+
+**Accept** brings back the window you started in, waits a moment, checks it again (the field may
+have become a password field while the rewrite ran), and pastes with Ctrl+V. When it can't:
+
+| When | Message |
+|---|---|
+| that window has closed | The window you started in has closed. Copy the text instead. |
+| it will not come back to the front | The window you started in is no longer in front, so nothing was typed. Copy the text instead. |
+| another app has the clipboard open | Another app is using the clipboard. Try again. |
+| Windows refuses a call (the number is Windows' own error code) | Windows refused the request (code 5). |
+
+**Undo**, for two minutes after Accept, sends one Ctrl+Z to that window. When the window has
+closed, will not come back to the front, or now has a password field in front, the text you had
+selected goes on the clipboard instead, so you can paste it yourself. After two minutes, or with
+nothing replaced: "There is nothing to undo." **Copy** puts the result on the clipboard as an
+ordinary entry.
+
+**Your clipboard.** Before it copies or pastes, Redpen saves every format on the clipboard and
+puts each back afterwards, byte for byte. The text it pastes is marked so that clipboard history
+(Win+V) and the cloud clipboard leave it out. Not kept:
+
+- pictures held as drawing objects rather than data: bitmaps in their drawing-object form (Windows
+  makes them again from the image data, which is kept), metafiles and enhanced metafiles, palettes,
+  owner-drawn entries, and the private and drawing-object format ranges some programs use;
+- a format the app that copied it no longer provides (apps can put a format on the clipboard as a
+  promise and supply it only when asked; one that has closed can't);
+- everything except the text, when the clipboard holds more than 64 MB in all (a very large
+  image, say); the log records only the size left out.
+
+The Ctrl+C is the app's own copy, so when clipboard history is on, the text you selected appears
+in Win+V like anything you copy yourself.
+
+**Limits.**
+
+- Apps running as administrator are refused, as above.
+- Some apps ignore keys that another program sends; Redpen can't read or type there.
+- Terminals: Windows Terminal copies a selection with Ctrl+C, but the classic console treats
+  Ctrl+C as "stop", so Redpen can't read a selection there.
+- Text goes on the clipboard with Windows line endings and comes off it with plain ones.
+
 ## Coming next
 
-In the order of `docs/ROADMAP.md`: publik API, the rewrite actions, reading and replacing a
-selection in any Windows app, the popup and Settings, Linux, the personal dictionary and style
-presets, the plagiarism check, and installers.
+In the order of `docs/ROADMAP.md`: publik API, the rewrite actions, the popup and Settings (which
+put the shortcut on top of the capture above), Linux, the personal dictionary and style presets,
+the plagiarism check, and installers.

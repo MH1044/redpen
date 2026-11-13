@@ -7,11 +7,15 @@
 //! and only [`store`] touches files, under the directories its caller names.
 //! [`check`] runs Harper on this computer (module 01); [`provider`] is the one chat client for
 //! the own key, a local model and the fake provider, with its cache, usage counts and errors, and
-//! [`store`] holds the settings, the keys and `redpen.db` (module 02). Rewriting, publik API,
-//! capture and the plagiarism check arrive with the later modules (docs/ROADMAP.md).
+//! [`store`] holds the settings, the keys and `redpen.db` (module 02). [`platform`] is the
+//! capture boundary, the `Capture` trait with its refusals and fake, and [`flow`] drives it: the
+//! capture of a selection, Accept and Undo (module 05). Rewriting, publik API and the plagiarism
+//! check arrive with the later modules (docs/ROADMAP.md).
 
 pub mod check;
 pub mod clock;
+pub mod flow;
 pub mod net;
+pub mod platform;
 pub mod provider;
 pub mod store;

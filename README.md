@@ -8,8 +8,11 @@ check that needs the web.
 **Status: pre-alpha.** Local checking works from the command line: `redpen check` runs Harper on
 a text file, on this computer, in American, British, Australian, Canadian or Indian English, and
 `redpen fix-all` applies its fixes. `redpen chat` sends one message to your own key or to a local
-model (Ollama) through the client the rewrites will use. Nothing rewrites yet, and the tray app
-only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order; `docs/PRODUCT.md` describes the finished
+model (Ollama) through the client the rewrites will use. On Windows, the capture the shortcut will
+use is built: it reads the selection in the app in front and types a result back through the
+clipboard, refuses password fields, password managers and windows running as administrator before
+any key is sent, and puts the clipboard back as it was. Nothing rewrites yet, no shortcut is
+registered, and the tray app only starts with a Quit menu. `docs/ROADMAP.md` lists what comes next, in order; `docs/PRODUCT.md` describes the finished
 app; `docs/HANDBOOK.md` shows what works today.
 
 ## What it replaces
@@ -85,6 +88,14 @@ parameters; `--provider own-key` reads your key, base URL and model from `REDPEN
 as `{"content": "...", "from_cache": false}`; an error as `{"error": {"kind": "...", "message":
 "..."}}` with exit code 3.
 
+The Windows capture tests type real keys into a helper window and replace the clipboard, so they
+run only when asked, on a computer with nothing else open (`docs/TESTING.md` §6). Without the
+variable they skip:
+
+```sh
+REDPEN_DESKTOP_TESTS=1 cargo test -p redpen-os --test 05_capture_windows -- --test-threads=1
+```
+
 The free speed gate times Harper on a 1,000-word text from a release build (`docs/TESTING.md` §4):
 
 ```sh
@@ -98,7 +109,7 @@ PowerShell: `powershell -File scripts/gates.ps1 check-speed`.
 | Path | What |
 |---|---|
 | `crates/redpen-core` | The platform-free core: checking, rewriting, plagiarism matching, providers, storage. The clock and the network are injected, so tests run with fakes |
-| `crates/redpen-os` | Reading and replacing a selection on Windows and Linux |
+| `crates/redpen-os` | Reading and replacing a selection on Windows and Linux, and `redpen-testwin`, the helper window its Windows tests type into |
 | `crates/redpen-cli` | The `redpen` command-line tool the golden tests drive, and the hygiene and recordings checks |
 | `app/` | The React and TypeScript interface; `app/src-tauri/` is the Tauri shell (tray, windows, commands) |
 | `scripts/` | `verify.sh` and `verify.ps1`, `gates.sh` and `gates.ps1` (quality gates), the icon generator |

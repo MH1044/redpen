@@ -21,6 +21,9 @@ Commands:
   `npm run typecheck`, `npm run lint`, `npm run format:check`, `cargo deny check licenses`,
   `cargo test --workspace`, `npm test`. It stops at the first failure.
 - One module's goldens: `GOLDEN_FILTER=04-rewrite-engine cargo test -p redpen-cli --test golden`.
+- The Windows desktop tests (module 05), on purpose only, with nothing else open, since they type
+  into the window in front and replace the clipboard: `REDPEN_DESKTOP_TESTS=1 cargo test -p
+  redpen-os --test 05_capture_windows -- --test-threads=1`. Without the variable each one skips.
 - A new golden case's expected file (never to turn a red test green): `UPDATE_GOLDEN=1
   GOLDEN_FILTER=<module>/<case>`, then read the diff line by line.
 - Re-record fake answers with a real provider (maintainer only, synthetic corpus only, spends
@@ -176,6 +179,10 @@ held before.
 **Refusals**: a browser password field, the Windows credential prompt, 1Password or Bitwarden, an
 administrator Command Prompt: each refused with its message, at capture and at Accept.
 
+**Blocklist names**: on a computer with each password manager of the default blocklist installed
+(1Password, Bitwarden, KeePass, KeePassXC, Dashlane, Enpass, NordPass, Proton Pass), its window in
+front is refused as `Blocklisted`, which confirms the process name in docs/ARCHITECTURE.md §4.
+
 **Popup**: findings and fixes; each action; diff colours in light and dark mode; keyboard only
 (1–7, Enter, Esc, Ctrl+Shift+C); positioning on a second monitor and at screen edges; consent view;
 first-run card at $0.00; 402 with one link; offline message.
@@ -188,5 +195,7 @@ article as a source; an original paragraph shows nothing found; Copy citation in
 the expected text; Open opens the browser; the footer shows the searches and the charge; with only
 Local chosen the check explains what it needs and the sent log stays empty.
 
-**Formats not preserved on the clipboard** (named in the HANDBOOK): enhanced metafiles, palettes,
-delayed-render formats.
+**Formats not preserved on the clipboard** (named in the HANDBOOK): bitmaps in their
+drawing-object form (made again from the DIB), metafiles, enhanced metafiles, palettes,
+owner-drawn entries, the private and drawing-object format ranges, delayed-render formats whose app
+no longer renders them, and everything but the text above 64 MB.

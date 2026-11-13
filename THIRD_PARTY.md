@@ -22,6 +22,7 @@ adds them.
 | thiserror | MIT OR Apache-2.0 | Error types with their messages |
 | tokio | MIT | The async runtime (the command line's `chat` too) and the production `Sleeper` |
 | tracing | MIT | Log events without content: names, durations, sizes, error kinds and HTTP status codes (module 02) |
+| windows | MIT OR Apache-2.0 | Capture on Windows (module 05), in `redpen-os` only: UI Automation for password fields, process tokens for elevation, `SendInput` for Ctrl+C, Ctrl+V and Ctrl+Z, and the clipboard; it brings Microsoft's `windows-core`, `windows-result`, `windows-strings`, `windows-link` and their companions (MIT OR Apache-2.0) |
 | ignore (tests only) | Unlicense OR MIT | The source-hygiene test's fallback walk, honouring `.gitignore` |
 | libtest-mimic (tests only) | MIT OR Apache-2.0 | One test per golden case directory |
 | proptest (tests only) | MIT OR Apache-2.0 | Generated texts with a fixed seed in the checking tests (module 01) |

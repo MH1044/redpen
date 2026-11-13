@@ -7,7 +7,7 @@
 | 02 | provider-layer | One OpenAI-compatible client with own key, local (Ollama) and fake providers, cache, errors | load-bearing | 00 | Done (2026-11-12) |
 | 03 | publik | The Publik contract in full (`ai.chat` and `search`): provisioning, status, errors, consent strings, the search helper, tray balance | load-bearing (money path) | 02 | Planned |
 | 04 | rewrite-engine | The six rewrite actions with versioned prompts, validation, redaction, language keeping, the guard, word diff | load-bearing | 01, 02, 03 | Planned |
-| 05 | capture-and-replace-windows | Read and replace a selection in any Windows app, refuse secure fields, restore the clipboard | load-bearing (privacy) | 00 | Planned |
+| 05 | capture-and-replace-windows | Read and replace a selection in any Windows app, refuse secure fields, restore the clipboard | load-bearing (privacy) | 00 | Done (2026-11-13) |
 | 06 | popup-and-settings-ui | The popup, Settings, welcome, consent and first-run card; the rewrite flow end to end | interface | 03, 04, 05 | Planned |
 | 07 | capture-linux | Capture, refusals and replacement on Linux X11, and Wayland's limits stated | load-bearing (privacy) | 05, 06 | Planned |
 | 08 | dictionary-styles-and-languages | Personal dictionary in Harper and Settings, import and export, rewrite style presets, languages | interface and core | 01, 04, 06 | Planned |

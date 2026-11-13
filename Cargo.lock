@@ -5539,6 +5539,13 @@ dependencies = [
 [[package]]
 name = "redpen-os"
 version = "0.1.0"
+dependencies = [
+ "redpen-core",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "windows 0.62.2",
+]
 
 [[package]]
 name = "ref-cast"

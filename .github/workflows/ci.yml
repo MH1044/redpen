@@ -1,6 +1,6 @@
 # CI (docs/TESTING.md §6): the full check on Windows and Linux for every push to main and every
-# pull request, then the launch smoke. The windows-integration job arrives with module 05 and the
-# release jobs with module 10.
+# pull request, then the launch smoke; and the capture tests on a real Windows desktop
+# (windows-integration, module 05). The release jobs arrive with module 10.
 
 name: CI
 
@@ -79,3 +79,42 @@ jobs:
         run: |
           cargo build -p redpen-app
           timeout 90 dbus-run-session -- xvfb-run -a target/debug/redpen-app --smoke
+
+  # Capture and clipboard on a real desktop (docs/modules/05-capture-and-replace-windows.md): the
+  # tests type real keys into redpen-testwin and replace the clipboard, so they run only here,
+  # with REDPEN_DESKTOP_TESTS set, one at a time. Then the launch smoke, as in verify.
+  windows-integration:
+    name: windows-integration
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Rust toolchain from rust-toolchain.toml
+        run: |
+          rustup toolchain install
+          rustup show active-toolchain
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: capture and clipboard tests
+        env:
+          REDPEN_DESKTOP_TESTS: '1'
+        run: cargo test -p redpen-os --test 05_capture_windows -- --test-threads=1
+
+      - name: launch smoke
+        shell: pwsh
+        run: |
+          npm ci --prefix app
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm --prefix app run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo build -p redpen-app
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & target/debug/redpen-app.exe --smoke
+          if ($LASTEXITCODE -ne 0) { Write-Host "launch smoke failed with exit code $LASTEXITCODE"; exit $LASTEXITCODE }
